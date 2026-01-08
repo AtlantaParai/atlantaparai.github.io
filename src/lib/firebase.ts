@@ -15,3 +15,13 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
+
+// Configure Google provider with custom parameters for Sheets access
+googleProvider.setCustomParameters({
+  'access_type': 'offline',
+  'prompt': 'consent'
+});
+
+// Add Google Sheets scope for OAuth
+googleProvider.addScope('https://www.googleapis.com/auth/spreadsheets');
+googleProvider.addScope('https://www.googleapis.com/auth/drive.file');

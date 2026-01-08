@@ -3,6 +3,7 @@
 import InstrumentStatus from '@/components/InstrumentStatus';
 import { instruments } from '@/data/instruments';
 import { useAuth } from '@/contexts/AuthContext';
+import Link from 'next/link';
 
 export default function Home() {
   const { user, loading, signInWithGoogle, logout, isAuthorized } = useAuth();
@@ -68,14 +69,23 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <img src="/images/ATPLogo.png" alt="ATP Logo" className="h-12 w-12" />
-            <h1 className="text-xl font-semibold">Welcome, {user.displayName}</h1>
+            <div className="flex items-center gap-4">
+              <span className="text-xl font-semibold">Instruments</span>
+              <span className="text-gray-400">|</span>
+              <Link href="/attendance" className="text-blue-600 hover:text-blue-800 font-medium">
+                Attendance
+              </Link>
+            </div>
           </div>
-          <button
-            onClick={logout}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            Sign Out
-          </button>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600">Welcome, {user.displayName}</span>
+            <button
+              onClick={logout}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
         </div>
       </div>
       <InstrumentStatus initialInstruments={instruments} />

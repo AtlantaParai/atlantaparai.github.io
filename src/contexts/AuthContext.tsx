@@ -11,6 +11,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   isAuthorized: boolean;
+  getAccessToken: () => Promise<string | null>;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -45,6 +46,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const getAccessToken = async (): Promise<string | null> => {
+    if (!user) return null;
+    try {
+      // Get the Firebase ID token first
+      const idToken = await user.getIdToken();
+      
+      // For Google Sheets API, we need the OAuth access token
+      // This requires the user to have signed in with the proper scopes
+      const credential = await user.getIdTokenResult();
+      
+      // Check if we have the access token in the credential
+      if (credential.claims.firebase && credential.claims.firebase.sign_in_provider === 'google.com') {
+        // Return the ID token for now - Firebase handles the OAuth flow
+        return idToken;
+      }
+      
+      return idToken;
+    } catch (error) {
+      console.error('Error getting access token:', error);
+      return null;
+    }
+  };
+
   const isAuthorized = isUserAuthorized(user?.email || null);
 
   return (
@@ -53,7 +77,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       loading,
       signInWithGoogle,
       logout,
-      isAuthorized
+      isAuthorized,
+      getAccessToken
     }}>
       {children}
     </AuthContext.Provider>

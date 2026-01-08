@@ -32,7 +32,17 @@ const firebaseConfig = {
 };
 ```
 
-### 2. Firestore Database Setup
+### 2. Google Sheets Setup for Attendance
+
+1. Create a new Google Sheet
+2. Name the first sheet "Attendance"
+3. Add headers in row 1: Date, Section, Member Name, Status, Recorded By, Timestamp
+4. Get the Sheet ID from the URL: `https://docs.google.com/spreadsheets/d/SHEET_ID/edit`
+5. Enable Google Sheets API in Google Cloud Console
+6. Create an API key with Sheets API access
+7. Add both values to your `.env.local` file
+
+### 3. Firestore Database Setup
 
 Create a collection called `instruments` with documents containing:
 ```json
@@ -46,7 +56,7 @@ Create a collection called `instruments` with documents containing:
 }
 ```
 
-### 3. GitHub Pages Deployment
+### 4. GitHub Pages Deployment
 
 1. Push your code to a GitHub repository
 2. Go to repository Settings > Pages
@@ -54,7 +64,7 @@ Create a collection called `instruments` with documents containing:
 4. The workflow will automatically deploy on push to main branch
 5. Your site will be available at `https://yourusername.github.io/APTWebsite/`
 
-### 4. Local Development
+### 5. Local Development
 
 ```bash
 npm install
@@ -65,8 +75,11 @@ npm run dev
 
 - `src/lib/firebase.ts` - Firebase configuration
 - `src/lib/firebase-service.ts` - Firestore operations
+- `src/lib/google-sheets-service.ts` - Google Sheets attendance tracking
 - `src/contexts/AuthContext.tsx` - Authentication context
-- `src/components/InstrumentStatus.tsx` - Main component
+- `src/components/InstrumentStatus.tsx` - Main instrument component
+- `src/components/AttendanceTracker.tsx` - Attendance tracking component
 - `src/data/` - Local data files (fallback)
+- `src/app/attendance/` - Attendance tracking page
 
 The application now uses Firebase for all backend services and deploys as a static site on GitHub Pages.
