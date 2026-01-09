@@ -1,8 +1,8 @@
 export class FinanceSheetsService {
   private static getSheetId(section: string): string {
     const sheetIds = {
-      '2025Adults': '1uP3xkywry5K_Yo5K9yvviRI7bx6oC6JbYuEdMXTMNSg',
-      '2025KidsTeens': '124RN9eEJ_uld7zUOC_ascolnZJpal8i5RCLnVpC8ye8',
+      '2025 Adults': '1uP3xkywry5K_Yo5K9yvviRI7bx6oC6JbYuEdMXTMNSg',
+      '2025 Kids Teens': '124RN9eEJ_uld7zUOC_ascolnZJpal8i5RCLnVpC8ye8',
       'Core Adults': '1avpggbRPDyXLZw0qNzm1DhHGghxw2cunTbHH4lZmWaY',
       'Core Teens Kids': '1LOcaZpx0lo54lm-AOanq7Y7MoXerteiNTbwgQFMiyCs'
     };
@@ -11,8 +11,8 @@ export class FinanceSheetsService {
   
   private static getSheetName(section: string): string {
     const sheetNames = {
-      '2025Adults': 'Sheet1',
-      '2025KidsTeens': 'Sheet1',
+      '2025 Adults': 'Sheet1',
+      '2025 Kids Teens': 'Sheet1',
       'Core Adults': 'Sheet1',
       'Core Teens Kids': 'Sheet1'
     };
@@ -23,10 +23,10 @@ export class FinanceSheetsService {
     if (section === 'Core Teens Kids') {
       return { column: 'M', index: 12 }; // Column M (index 12)
     }
-    if (section === '2025Adults') {
+    if (section === '2025 Adults') {
       return { column: 'J', index: 9 }; // Column J (index 9)
     }
-    if (section === '2025KidsTeens') {
+    if (section === '2025 Kids Teens') {
       return { column: 'F', index: 5 }; // Column F (index 5)
     }
     return { column: 'E', index: 4 }; // Column E (index 4) for Core Adults

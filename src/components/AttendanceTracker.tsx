@@ -20,15 +20,15 @@ interface AttendanceRecord {
 }
 
 export default function AttendanceTracker() {
-  const [selectedSection, setSelectedSection] = useState('2025Adults');
+  const [selectedSection, setSelectedSection] = useState('2025 Adults');
   const [attendanceStatus, setAttendanceStatus] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [oauthReady, setOauthReady] = useState(false);
   const { user } = useAuth();
 
   const sections = {
-    '2025Adults': adults2025.map((name, index) => ({ id: `2025adults-${index + 1}`, name })),
-    '2025KidsTeens': kidsTeens2025.map((name, index) => ({ id: `2025kidsteens-${index + 1}`, name })),
+    '2025 Adults': adults2025.map((name, index) => ({ id: `2025adults-${index + 1}`, name })),
+    '2025 Kids Teens': kidsTeens2025.map((name, index) => ({ id: `2025kidsteens-${index + 1}`, name })),
     'Core Adults': coreAdults.map((name, index) => ({ id: `coreadults-${index + 1}`, name })),
     'Core Teens Kids': coreTeensKids.map((name, index) => ({ id: `coreteenskids-${index + 1}`, name })),
   };
@@ -44,6 +44,29 @@ export default function AttendanceTracker() {
       loadTodayAttendance();
     }
   }, [selectedSection, oauthReady]);
+
+  // Reload data when tab becomes visible/focused
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && oauthReady) {
+        loadTodayAttendance();
+      }
+    };
+
+    const handleFocus = () => {
+      if (oauthReady) {
+        loadTodayAttendance();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [oauthReady]);
 
   const loadTodayAttendance = async () => {
     try {
@@ -117,30 +140,22 @@ export default function AttendanceTracker() {
   const counts = getStatusCounts();
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-2xl font-bold text-center mb-6">Attendance Tracker</h1>
-      
+    <div className="max-w-6xl mx-auto p-4">
       {loading && (
-        <div className="text-center mb-4">
+        <div className="text-center mb-2">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         </div>
       )}
 
       {/* Controls */}
-      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-        {!oauthReady && (
-          <div className="text-center mb-4">
-            <p className="text-gray-600">Initializing Google Sheets access...</p>
-          </div>
-        )}
-        
+      <div className="bg-white rounded-lg shadow-md p-3 mb-2">
         {/* Section Tabs */}
         <div className="grid grid-cols-4 gap-2">
           {Object.keys(sections).map((section) => (
             <button
               key={section}
               onClick={() => setSelectedSection(section)}
-              className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
+              className={`px-2 py-2 rounded-lg transition-colors text-xs leading-tight text-center ${
                 selectedSection === section
                   ? 'bg-orange-500 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -153,7 +168,7 @@ export default function AttendanceTracker() {
       </div>
 
       {/* Counts and Reset Button */}
-      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+      <div className="bg-white rounded-lg shadow-md p-2 mb-2">
         <div className="flex justify-end items-center">
           <div className="flex items-center gap-4">
             <div className="flex gap-4">
@@ -162,7 +177,7 @@ export default function AttendanceTracker() {
             </div>
             <button
               onClick={resetAttendance}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded-lg transition-colors text-sm"
             >
               🔄 Reset
             </button>
@@ -171,7 +186,7 @@ export default function AttendanceTracker() {
       </div>
 
       {/* Members Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Absent Members */}
         <div className="bg-white rounded-lg shadow-md p-4">
           <h2 className="text-lg font-bold text-red-600 mb-2 text-center">Absent</h2>
