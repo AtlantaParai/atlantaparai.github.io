@@ -23,7 +23,7 @@ export default function Home() {
         <div className="bg-white p-8 rounded-lg shadow-md text-center max-w-md">
           <div className="flex items-center justify-center gap-4 mb-6">
             <img src={process.env.NODE_ENV === 'production' ? '/APTWebsite/images/ATPLogo.png' : '/images/ATPLogo.png'} alt="ATP Logo" className="h-16 w-16" />
-            <h1 className="text-3xl font-bold">APT Instrument Status</h1>
+            <h1 className="text-3xl font-bold">Atlanta Parai Team</h1>
           </div>
           <p className="text-gray-600 mb-6">Sign in with Google to access the system</p>
           <button

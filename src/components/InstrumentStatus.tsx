@@ -139,7 +139,7 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-8">APT Instrument Status</h1>
+      <h1 className="text-3xl font-bold text-center mb-8">Atlanta Parai Team</h1>
       {loading && (
         <div className="text-center mb-4">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>

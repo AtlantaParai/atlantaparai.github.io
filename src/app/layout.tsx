@@ -3,7 +3,7 @@ import './globals.css'
 import { AuthProvider } from '@/contexts/AuthContext'
 
 export const metadata: Metadata = {
-  title: 'APT Instrument Status',
+  title: 'Atlanta Parai Team',
   description: 'Track instrument checkout status for APT',
 }
 

@@ -118,7 +118,7 @@ export default function AttendanceTracker() {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-8">Attendance Tracker</h1>
+      <h1 className="text-2xl font-bold text-center mb-6">Attendance Tracker</h1>
       
       {loading && (
         <div className="text-center mb-4">
@@ -134,24 +134,28 @@ export default function AttendanceTracker() {
           </div>
         )}
         
-        {/* Section Tabs and Controls */}
-        <div className="flex justify-between items-center">
-          <div className="flex gap-2 overflow-x-auto">
-            {Object.keys(sections).map((section) => (
-              <button
-                key={section}
-                onClick={() => setSelectedSection(section)}
-                className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
-                  selectedSection === section
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                {section}
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center gap-4 ml-4">
+        {/* Section Tabs */}
+        <div className="grid grid-cols-4 gap-2">
+          {Object.keys(sections).map((section) => (
+            <button
+              key={section}
+              onClick={() => setSelectedSection(section)}
+              className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
+                selectedSection === section
+                  ? 'bg-orange-500 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              {section}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Counts and Reset Button */}
+      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div className="flex justify-end items-center">
+          <div className="flex items-center gap-4">
             <div className="flex gap-4">
               <span className="text-green-600 font-semibold">Present: {counts.present}</span>
               <span className="text-red-600 font-semibold">Absent: {counts.absent}</span>
@@ -170,7 +174,7 @@ export default function AttendanceTracker() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Absent Members */}
         <div className="bg-white rounded-lg shadow-md p-4">
-          <h2 className="text-xl font-bold text-red-600 mb-2 text-center">Absent</h2>
+          <h2 className="text-lg font-bold text-red-600 mb-2 text-center">Absent</h2>
           <div className="space-y-2">
             {getFilteredMembers()
               .filter(member => attendanceStatus[member.name] !== 'present')
@@ -178,7 +182,7 @@ export default function AttendanceTracker() {
                 <button
                   key={member.id}
                   onClick={() => toggleAttendance(member)}
-                  className="w-full flex justify-between items-center p-3 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
+                  className="w-full flex justify-between items-center p-2 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors text-sm"
                 >
                   <span className="text-red-800">{member.name}</span>
                   <span className="text-red-600">❌</span>
@@ -189,7 +193,7 @@ export default function AttendanceTracker() {
 
         {/* Present Members */}
         <div className="bg-white rounded-lg shadow-md p-4">
-          <h2 className="text-xl font-bold text-green-600 mb-2 text-center">Present</h2>
+          <h2 className="text-lg font-bold text-green-600 mb-2 text-center">Present</h2>
           <div className="space-y-2">
             {getFilteredMembers()
               .filter(member => attendanceStatus[member.name] === 'present')
@@ -197,7 +201,7 @@ export default function AttendanceTracker() {
                 <button
                   key={member.id}
                   onClick={() => toggleAttendance(member)}
-                  className="w-full flex justify-between items-center p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+                  className="w-full flex justify-between items-center p-2 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors text-sm"
                 >
                   <span className="text-green-800 font-semibold">{member.name}</span>
                   <span className="text-green-600">✅</span>

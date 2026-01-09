@@ -117,7 +117,7 @@ export default function FinanceTracker() {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-8">Finance Tracker</h1>
+      <h1 className="text-2xl font-bold text-center mb-6">Finance Tracker</h1>
       
       {loading && (
         <div className="text-center mb-4">
@@ -133,24 +133,28 @@ export default function FinanceTracker() {
           </div>
         )}
         
-        {/* Section Tabs and Controls */}
-        <div className="flex justify-between items-center">
-          <div className="flex gap-2 overflow-x-auto">
-            {Object.keys(sections).map((section) => (
-              <button
-                key={section}
-                onClick={() => setSelectedSection(section)}
-                className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
-                  selectedSection === section
-                    ? 'bg-red-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                {section}
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center gap-4 ml-4">
+        {/* Section Tabs */}
+        <div className="grid grid-cols-4 gap-2">
+          {Object.keys(sections).map((section) => (
+            <button
+              key={section}
+              onClick={() => setSelectedSection(section)}
+              className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
+                selectedSection === section
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              {section}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Counts and Reset Button */}
+      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div className="flex justify-end items-center">
+          <div className="flex items-center gap-4">
             <div className="flex gap-4">
               <span className="text-green-600 font-semibold">Paid: {counts.paid}</span>
               <span className="text-red-600 font-semibold">Unpaid: {counts.unpaid}</span>
@@ -169,7 +173,7 @@ export default function FinanceTracker() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Unpaid Members */}
         <div className="bg-white rounded-lg shadow-md p-4">
-          <h2 className="text-xl font-bold text-red-600 mb-2 text-center">Unpaid</h2>
+          <h2 className="text-lg font-bold text-red-600 mb-2 text-center">Unpaid</h2>
           <div className="space-y-2">
             {getFilteredMembers()
               .filter(member => paymentStatus[member.name] !== 'paid')
@@ -177,7 +181,7 @@ export default function FinanceTracker() {
                 <button
                   key={member.id}
                   onClick={() => togglePaymentStatus(member)}
-                  className="w-full flex justify-between items-center p-3 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
+                  className="w-full flex justify-between items-center p-2 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors text-sm"
                 >
                   <span className="text-red-800">{member.name}</span>
                   <span className="text-red-600">❌</span>
@@ -188,7 +192,7 @@ export default function FinanceTracker() {
 
         {/* Paid Members */}
         <div className="bg-white rounded-lg shadow-md p-4">
-          <h2 className="text-xl font-bold text-green-600 mb-2 text-center">Paid</h2>
+          <h2 className="text-lg font-bold text-green-600 mb-2 text-center">Paid</h2>
           <div className="space-y-2">
             {getFilteredMembers()
               .filter(member => paymentStatus[member.name] === 'paid')
@@ -196,7 +200,7 @@ export default function FinanceTracker() {
                 <button
                   key={member.id}
                   onClick={() => togglePaymentStatus(member)}
-                  className="w-full flex justify-between items-center p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+                  className="w-full flex justify-between items-center p-2 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors text-sm"
                 >
                   <span className="text-green-800 font-semibold">{member.name}</span>
                   <span className="text-green-600">✅</span>

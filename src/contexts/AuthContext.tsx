@@ -44,6 +44,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     try {
       await signOut(auth);
+      // Redirect to home page after logout
+      window.location.href = '/';
     } catch (error) {
       console.error('Sign out error:', error);
     }

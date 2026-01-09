@@ -1,4 +1,4 @@
-# APT Instrument Status
+# Atlanta Parai Team
 
 A Next.js application for tracking musical instrument checkout status, now using Firebase for authentication and data storage, deployed on GitHub Pages.
 
