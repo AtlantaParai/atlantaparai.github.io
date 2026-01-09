@@ -11,6 +11,11 @@ export class GoogleOAuthService {
   private static accessToken: string | null = null;
 
   static async initialize() {
+    // Try to restore token from localStorage
+    if (typeof window !== 'undefined') {
+      this.accessToken = localStorage.getItem('google_access_token');
+    }
+    
     return new Promise<void>((resolve) => {
       if (window.google?.accounts) {
         this.setupTokenClient();
@@ -35,16 +40,31 @@ export class GoogleOAuthService {
       callback: (response: any) => {
         if (response.access_token) {
           this.accessToken = response.access_token;
+          // Store token in localStorage
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('google_access_token', response.access_token);
+          }
         }
       },
     });
   }
 
   static async getAccessToken(): Promise<string | null> {
+    // First check if we have a valid token in memory or localStorage
     if (this.accessToken) {
       return this.accessToken;
     }
+    
+    // Try to restore from localStorage
+    if (typeof window !== 'undefined') {
+      const storedToken = localStorage.getItem('google_access_token');
+      if (storedToken) {
+        this.accessToken = storedToken;
+        return storedToken;
+      }
+    }
 
+    // No token found, need to request one
     return new Promise((resolve) => {
       if (!this.tokenClient) {
         resolve(null);
@@ -55,6 +75,10 @@ export class GoogleOAuthService {
       this.tokenClient.callback = (response: any) => {
         if (response.access_token) {
           this.accessToken = response.access_token;
+          // Store in localStorage
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('google_access_token', response.access_token);
+          }
           resolve(response.access_token);
         } else {
           resolve(null);
@@ -70,6 +94,10 @@ export class GoogleOAuthService {
     if (this.accessToken) {
       window.google.accounts.oauth2.revoke(this.accessToken);
       this.accessToken = null;
+      // Clear token from localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('google_access_token');
+      }
     }
   }
 }

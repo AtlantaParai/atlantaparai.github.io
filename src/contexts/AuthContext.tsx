@@ -44,8 +44,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     try {
       await signOut(auth);
-      // Redirect to home page after logout
-      window.location.href = '/';
+      // Clear Google Sheets token when logging out
+      const { GoogleOAuthService } = await import('@/lib/google-oauth');
+      GoogleOAuthService.revokeToken();
+      // Redirect to home page after logout with proper base path
+      const basePath = process.env.NODE_ENV === 'production' ? '/APTWebsite' : '';
+      window.location.href = basePath + '/';
     } catch (error) {
       console.error('Sign out error:', error);
     }
