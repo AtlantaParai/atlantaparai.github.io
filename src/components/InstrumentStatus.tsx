@@ -4,18 +4,21 @@ import { useState, useEffect } from 'react';
 import { Instrument } from '@/data/instruments';
 import { Member, membersList } from '@/data/members';
 import { FirebaseService } from '@/lib/firebase-service';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface InstrumentStatusProps {
   initialInstruments: Instrument[];
 }
 
 export default function InstrumentStatus({ initialInstruments }: InstrumentStatusProps) {
+  const { user } = useAuth();
   const [instruments, setInstruments] = useState<Instrument[]>(initialInstruments);
   const [activeTab, setActiveTab] = useState<'available' | 'checkedOut'>('available');
   const [selectedInstrument, setSelectedInstrument] = useState<Instrument | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showForceUpdate, setShowForceUpdate] = useState(false);
 
   useEffect(() => {
     loadInstrumentsFromFirebase();
@@ -50,12 +53,10 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
     };
   }, []);
 
-  const loadInstrumentsFromFirebase = async () => {
+  const forceUpdateFirebase = async () => {
     try {
       setLoading(true);
-      
-      // Force clear and reload all instruments with correct image paths
-      console.log('Clearing and reloading all instruments...');
+      console.log('Force updating Firebase...');
       await FirebaseService.clearAllInstruments();
       
       for (const instrument of initialInstruments) {
@@ -69,20 +70,70 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
         });
       }
       
-      // Load the fresh data
+      await loadInstrumentsFromFirebase();
+      setShowForceUpdate(false);
+    } catch (error) {
+      console.error('Force update failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadInstrumentsFromFirebase = async () => {
+    try {
+      setLoading(true);
+      
+      // Load existing instruments from Firebase
       const firebaseInstruments = await FirebaseService.getAllInstruments();
-      const mappedInstruments = firebaseInstruments.map((firebase: any) => ({
-        id: firebase.id,
-        name: firebase.name,
-        type: firebase.type,
-        image: firebase.image,
-        isCheckedOut: firebase.status === 'checked_out',
-        checkedOutBy: firebase.checkedOutBy,
-        checkedOutAt: firebase.updatedAt
-      }));
-      setInstruments(mappedInstruments);
+      console.log('Firebase instruments found:', firebaseInstruments.length);
+      
+      if (firebaseInstruments.length === 0) {
+        // No instruments in Firebase, add them
+        console.log('Adding instruments to Firebase...');
+        for (const instrument of initialInstruments) {
+          await FirebaseService.addInstrument({
+            id: instrument.id,
+            name: instrument.name,
+            type: instrument.type,
+            image: instrument.image,
+            status: 'available',
+            checkedOutBy: null
+          });
+        }
+        // Reload after adding
+        const newFirebaseInstruments = await FirebaseService.getAllInstruments();
+        const mappedInstruments = newFirebaseInstruments.map((firebase: any) => ({
+          id: firebase.id,
+          name: firebase.name,
+          type: firebase.type,
+          image: firebase.image,
+          isCheckedOut: firebase.status === 'checked_out',
+          checkedOutBy: firebase.checkedOutBy,
+          checkedOutAt: firebase.updatedAt
+        }));
+        setInstruments(mappedInstruments);
+      } else {
+        // Use existing Firebase data
+        const mappedInstruments = firebaseInstruments.map((firebase: any) => ({
+          id: firebase.id,
+          name: firebase.name,
+          type: firebase.type,
+          image: firebase.image,
+          isCheckedOut: firebase.status === 'checked_out',
+          checkedOutBy: firebase.checkedOutBy,
+          checkedOutAt: firebase.updatedAt
+        }));
+        setInstruments(mappedInstruments);
+      }
     } catch (error) {
       console.error('Failed to load from Firebase:', error);
+      // Fallback to initial instruments if Firebase fails
+      setInstruments(initialInstruments.map(inst => ({
+        ...inst,
+        isCheckedOut: false,
+        checkedOutBy: null,
+        checkedOutAt: null
+      })));
     } finally {
       setLoading(false);
     }
@@ -188,6 +239,7 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
       {loading && (
         <div className="text-center mb-2">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <p className="text-sm text-gray-600 mt-1">Loading instruments...</p>
         </div>
       )}
       <div className="bg-white rounded-lg shadow-md p-2 mb-2">
@@ -212,8 +264,39 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
           >
             Checked Out ({checkedOutInstruments.length})
           </button>
+          {user?.email === 'ayyapps4u@gmail.com' && (
+            <button
+              onClick={() => setShowForceUpdate(true)}
+              className="ml-2 py-2 px-3 rounded-lg font-medium transition-colors text-sm bg-orange-500 text-white hover:bg-orange-600"
+            >
+              🔄
+            </button>
+          )}
         </div>
       </div>
+
+      {showForceUpdate && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-4 w-80">
+            <h2 className="text-lg font-bold mb-3">Force Update Firebase?</h2>
+            <p className="text-sm text-gray-600 mb-4">This will clear all instruments from Firebase and reload them with current data. Any checkout status will be lost.</p>
+            <div className="flex gap-2">
+              <button
+                onClick={forceUpdateFirebase}
+                className="flex-1 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+              >
+                Update
+              </button>
+              <button
+                onClick={() => setShowForceUpdate(false)}
+                className="flex-1 bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
         {(activeTab === 'available' ? availableInstruments : checkedOutInstruments).map((instrument) => (
