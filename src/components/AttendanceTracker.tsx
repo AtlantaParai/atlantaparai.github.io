@@ -79,7 +79,7 @@ export default function AttendanceTracker() {
             
             // Only mark absent if there were some attendance records today (indicating a meeting)
             if (todayRecords.length > 0) {
-              const presentMembers = new Set(todayRecords.map(r => r.memberName));
+              const presentMembers = new Set(todayRecords.map((r: any) => r.memberName));
               const sectionMembers = sections[section as keyof typeof sections];
               
               console.log(`Section ${section}: ${presentMembers.size} present, ${sectionMembers.length - presentMembers.size} to mark absent`);
