@@ -100,7 +100,23 @@ export class GoogleOAuthService {
         this.tokenClient.callback = originalCallback;
       };
 
-      this.tokenClient.requestAccessToken({ prompt: 'consent' });
+      const isMobileSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent);
+      
+      if (isMobileSafari) {
+        // For mobile Safari, use redirect flow
+        const redirectUri = window.location.origin + window.location.pathname;
+        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+          `client_id=${this.CLIENT_ID}&` +
+          `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+          `response_type=token&` +
+          `scope=${encodeURIComponent(this.SCOPES)}&` +
+          `prompt=consent`;
+        
+        window.location.href = authUrl;
+        return;
+      }
+      
+      this.tokenClient.requestAccessToken();
     });
   }
 
