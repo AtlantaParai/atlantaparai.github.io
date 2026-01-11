@@ -61,7 +61,14 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
       
       console.log('Initializing instruments sheet...');
       setDebugMessage('Initializing sheet...');
-      await InstrumentsSheetsService.initializeInstruments(initialInstruments, accessToken);
+      try {
+        await InstrumentsSheetsService.initializeInstruments(initialInstruments, accessToken);
+        setDebugMessage('Sheet initialized, loading data...');
+      } catch (initError: any) {
+        console.error('Sheet initialization failed:', initError);
+        setDebugMessage(`Init failed: ${initError?.message || 'Unknown error'}`);
+        return;
+      }
       
       console.log('Loading instruments from Google Sheets...');
       setDebugMessage('Loading from sheets...');
