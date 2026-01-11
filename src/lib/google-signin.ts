@@ -62,13 +62,25 @@ export class GoogleSignInService {
     // Store user in localStorage
     localStorage.setItem('google_user', JSON.stringify(this.user));
     
-    // Also request Sheets access immediately
+    // Request Sheets access and reload after token is received
     if (this.tokenClient) {
+      const originalCallback = this.tokenClient.callback;
+      this.tokenClient.callback = (tokenResponse: any) => {
+        if (tokenResponse.access_token) {
+          this.accessToken = tokenResponse.access_token;
+          localStorage.setItem('google_access_token', tokenResponse.access_token);
+          localStorage.setItem('google_sheets_token', tokenResponse.access_token);
+        }
+        // Restore original callback
+        this.tokenClient.callback = originalCallback;
+        // Now reload the page
+        window.location.reload();
+      };
       this.tokenClient.requestAccessToken();
+    } else {
+      // No token client, just reload
+      window.location.reload();
     }
-    
-    // Trigger page reload to update auth state
-    window.location.reload();
   }
 
   static async signIn() {
