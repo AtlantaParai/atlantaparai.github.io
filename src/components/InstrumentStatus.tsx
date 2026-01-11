@@ -52,6 +52,30 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
       console.log('Sheets instruments found:', sheetsInstruments.length, sheetsInstruments);
       setDebugMessage(`Found ${sheetsInstruments.length} instruments in sheet`);
       
+      // If no instruments found, initialize the sheet
+      if (sheetsInstruments.length === 0) {
+        console.log('No instruments found, initializing sheet...');
+        setDebugMessage('Initializing sheet with data...');
+        await InstrumentsSheetsService.initializeInstruments(initialInstruments, accessToken);
+        
+        // Reload after initialization
+        const newSheetsInstruments = await InstrumentsSheetsService.getAllInstruments(accessToken);
+        console.log('After initialization:', newSheetsInstruments.length, newSheetsInstruments);
+        setDebugMessage(`Initialized with ${newSheetsInstruments.length} instruments`);
+        
+        const mappedInstruments = newSheetsInstruments.map((sheet: any) => ({
+          id: sheet.id,
+          name: sheet.name,
+          type: sheet.type,
+          image: sheet.image,
+          isCheckedOut: sheet.status === 'checked_out',
+          checkedOutBy: sheet.checkedOutBy,
+          checkedOutAt: sheet.checkedOutAt
+        }));
+        setInstruments(mappedInstruments);
+        return;
+      }
+      
       const mappedInstruments = sheetsInstruments.map((sheet: any) => ({
         id: sheet.id,
         name: sheet.name,
