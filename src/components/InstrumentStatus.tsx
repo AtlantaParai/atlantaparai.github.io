@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Instrument } from '@/data/instruments';
 import { Member, membersList } from '@/data/members';
-import { FirebaseService } from '@/lib/firebase-service';
+import { InstrumentsSheetsService } from '@/lib/instruments-sheets-service';
+import { GoogleSignInService } from '@/lib/google-signin';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface InstrumentStatusProps {
@@ -22,75 +23,64 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
   const [loading, setLoading] = useState(false);
   const [showForceUpdate, setShowForceUpdate] = useState(false);
 
-  const loadInstrumentsFromFirebase = useCallback(async () => {
+  const loadInstrumentsFromSheets = useCallback(async () => {
     try {
       setLoading(true);
+      console.log('Loading instruments from sheets...');
       
-      // Load existing instruments from Firebase
-      const firebaseInstruments = await FirebaseService.getAllInstruments();
-      console.log('Firebase instruments found:', firebaseInstruments.length);
+      let accessToken = GoogleSignInService.getAccessToken();
+      console.log('Access token available:', !!accessToken);
       
-      if (firebaseInstruments.length === 0) {
-        // No instruments in Firebase, add them
-        console.log('Adding instruments to Firebase...');
-        for (const instrument of initialInstruments) {
-          await FirebaseService.addInstrument({
-            id: instrument.id,
-            name: instrument.name,
-            type: instrument.type,
-            image: instrument.image,
-            status: 'available',
-            checkedOutBy: null
-          });
+      if (!accessToken && user) {
+        console.log('No access token but user exists, requesting token...');
+        const { GoogleOAuthService } = await import('@/lib/google-oauth');
+        try {
+          accessToken = await GoogleOAuthService.getAccessToken();
+          console.log('Got fresh access token:', !!accessToken);
+        } catch (error) {
+          console.error('Failed to get fresh token:', error);
         }
-        // Reload after adding
-        const newFirebaseInstruments = await FirebaseService.getAllInstruments();
-        const mappedInstruments = newFirebaseInstruments.map((firebase: any) => ({
-          id: firebase.id,
-          name: firebase.name,
-          type: firebase.type,
-          image: firebase.image,
-          isCheckedOut: firebase.status === 'checked_out',
-          checkedOutBy: firebase.checkedOutBy,
-          checkedOutAt: firebase.updatedAt
-        }));
-        setInstruments(mappedInstruments);
-      } else {
-        // Use existing Firebase data
-        const mappedInstruments = firebaseInstruments.map((firebase: any) => ({
-          id: firebase.id,
-          name: firebase.name,
-          type: firebase.type,
-          image: firebase.image,
-          isCheckedOut: firebase.status === 'checked_out',
-          checkedOutBy: firebase.checkedOutBy,
-          checkedOutAt: firebase.updatedAt
-        }));
-        setInstruments(mappedInstruments);
       }
+      
+      if (!accessToken) {
+        console.log('No access token available');
+        return;
+      }
+      
+      console.log('Initializing instruments sheet...');
+      await InstrumentsSheetsService.initializeInstruments(initialInstruments, accessToken);
+      
+      console.log('Loading instruments from Google Sheets...');
+      const sheetsInstruments = await InstrumentsSheetsService.getAllInstruments(accessToken);
+      console.log('Sheets instruments found:', sheetsInstruments.length, sheetsInstruments);
+      
+      const mappedInstruments = sheetsInstruments.map((sheet: any) => ({
+        id: sheet.id,
+        name: sheet.name,
+        type: sheet.type,
+        image: sheet.image,
+        isCheckedOut: sheet.status === 'checked_out',
+        checkedOutBy: sheet.checkedOutBy,
+        checkedOutAt: sheet.checkedOutAt
+      }));
+      console.log('Mapped instruments:', mappedInstruments);
+      setInstruments(mappedInstruments);
     } catch (error) {
-      console.error('Failed to load from Firebase:', error);
-      // Fallback to initial instruments if Firebase fails
-      setInstruments(initialInstruments.map(inst => ({
-        ...inst,
-        isCheckedOut: false,
-        checkedOutBy: null,
-        checkedOutAt: null
-      })));
+      console.error('Failed to load from Google Sheets:', error);
     } finally {
       setLoading(false);
     }
-  }, [initialInstruments]);
+  }, [initialInstruments, user]);
 
   useEffect(() => {
-    loadInstrumentsFromFirebase();
-  }, [loadInstrumentsFromFirebase]);
+    loadInstrumentsFromSheets();
+  }, [loadInstrumentsFromSheets]);
 
   useEffect(() => {
     // Refresh data when window gets focus (tab switching back)
     const handleFocus = () => {
       console.log('Window focused, refreshing instruments...');
-      loadInstrumentsFromFirebase();
+      loadInstrumentsFromSheets();
     };
     
     window.addEventListener('focus', handleFocus);
@@ -110,7 +100,7 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
         
         if (pullDistance > 100) {
           isRefreshing = true;
-          loadInstrumentsFromFirebase();
+          loadInstrumentsFromSheets();
           setTimeout(() => { isRefreshing = false; }, 1000);
         }
       }
@@ -124,26 +114,20 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
       document.removeEventListener('touchstart', handleTouchStart);
       document.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [loadInstrumentsFromFirebase]);
+  }, [loadInstrumentsFromSheets]);
 
-  const forceUpdateFirebase = async () => {
+  const forceUpdateSheets = async () => {
     try {
       setLoading(true);
-      console.log('Force updating Firebase...');
-      await FirebaseService.clearAllInstruments();
-      
-      for (const instrument of initialInstruments) {
-        await FirebaseService.addInstrument({
-          id: instrument.id,
-          name: instrument.name,
-          type: instrument.type,
-          image: instrument.image,
-          status: 'available',
-          checkedOutBy: null
-        });
+      console.log('Force updating Google Sheets...');
+      const accessToken = GoogleSignInService.getAccessToken();
+      if (!accessToken) {
+        console.error('No access token available');
+        return;
       }
       
-      await loadInstrumentsFromFirebase();
+      await InstrumentsSheetsService.initializeInstruments(initialInstruments, accessToken);
+      await loadInstrumentsFromSheets();
       setShowForceUpdate(false);
     } catch (error) {
       console.error('Force update failed:', error);
@@ -172,10 +156,17 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
     
     try {
       setLoading(true);
-      await FirebaseService.updateInstrumentStatus(
+      const accessToken = GoogleSignInService.getAccessToken();
+      if (!accessToken) {
+        console.error('No access token available');
+        return;
+      }
+      
+      await InstrumentsSheetsService.updateInstrumentStatus(
         selectedInstrument.id,
         'checked_out',
-        member.name
+        member.name,
+        accessToken
       );
       
       const updatedInstruments = instruments.map(inst => {
@@ -204,10 +195,17 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
   const handleCheckIn = async (instrument: Instrument) => {
     try {
       setLoading(true);
-      await FirebaseService.updateInstrumentStatus(
+      const accessToken = GoogleSignInService.getAccessToken();
+      if (!accessToken) {
+        console.error('No access token available');
+        return;
+      }
+      
+      await InstrumentsSheetsService.updateInstrumentStatus(
         instrument.id,
         'available',
-        null
+        null,
+        accessToken
       );
       
       const updatedInstruments = instruments.map(item => 
@@ -291,11 +289,11 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
       {showForceUpdate && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-4 w-80">
-            <h2 className="text-lg font-bold mb-3">Force Update Firebase?</h2>
-            <p className="text-sm text-gray-600 mb-4">This will clear all instruments from Firebase and reload them with current data. Any checkout status will be lost.</p>
+            <h2 className="text-lg font-bold mb-3">Force Update Google Sheets?</h2>
+            <p className="text-sm text-gray-600 mb-4">This will reinitialize the Google Sheet with current instrument data. Any checkout status will be lost.</p>
             <div className="flex gap-2">
               <button
-                onClick={forceUpdateFirebase}
+                onClick={forceUpdateSheets}
                 className="flex-1 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
               >
                 Update
@@ -322,7 +320,10 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
                 key={`${instrument.id}-${activeTab}`}
                 onError={(e) => {
                   console.log('Image failed to load:', instrument.image);
-                  e.currentTarget.src = '/images/default-instrument.jpg';
+                  // Try with ./images/ prefix for production
+                  if (!e.currentTarget.src.startsWith('./images/')) {
+                    e.currentTarget.src = instrument.image.replace('/images/', './images/');
+                  }
                 }}
               />
               {!instrument.isCheckedOut ? (
