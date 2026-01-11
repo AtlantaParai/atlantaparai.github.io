@@ -47,9 +47,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Clear Google Sheets token when logging out
       const { GoogleOAuthService } = await import('@/lib/google-oauth');
       GoogleOAuthService.revokeToken();
-      // Redirect to home page after logout with proper base path
-      const basePath = process.env.NODE_ENV === 'production' ? '/APTWebsite' : '';
-      window.location.href = basePath + '/';
+      // Clear all Google auth cookies and sessions
+      if (window.google?.accounts) {
+        window.google.accounts.id.disableAutoSelect();
+      }
+      // Clear localStorage
+      localStorage.clear();
+      // Force reload to clear all cached state
+      window.location.reload();
     } catch (error) {
       console.error('Sign out error:', error);
     }
