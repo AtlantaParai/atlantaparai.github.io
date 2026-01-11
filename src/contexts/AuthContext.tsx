@@ -27,17 +27,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(user);
       setLoading(false);
     });
+    
+    // Check for redirect result on page load
+    const checkRedirectResult = async () => {
+      try {
+        const { getRedirectResult } = await import('firebase/auth');
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
+          console.log('Redirect sign-in successful:', result.user.email);
+        }
+      } catch (error) {
+        console.error('Redirect result error:', error);
+      }
+    };
+    
+    checkRedirectResult();
     return unsubscribe;
   }, []);
 
   const signInWithGoogle = async () => {
     try {
       console.log('Attempting Google sign-in...');
+      // For mobile Safari, try popup with user gesture
       const result = await signInWithPopup(auth, googleProvider);
       console.log('Sign-in successful:', result.user.email);
     } catch (error: any) {
       console.error('Sign in error:', error);
-      alert(`Sign-in failed: ${error.message}`);
+      
+      // If popup fails, try redirect for mobile Safari
+      if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+        try {
+          const { signInWithRedirect } = await import('firebase/auth');
+          await signInWithRedirect(auth, googleProvider);
+        } catch (redirectError: any) {
+          console.error('Redirect also failed:', redirectError);
+          alert(`Sign-in failed: ${error.message}`);
+        }
+      } else {
+        alert(`Sign-in failed: ${error.message}`);
+      }
     }
   };
 
