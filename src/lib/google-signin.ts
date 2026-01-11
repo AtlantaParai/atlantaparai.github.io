@@ -44,6 +44,7 @@ export class GoogleSignInService {
         if (response.access_token) {
           this.accessToken = response.access_token;
           localStorage.setItem('google_access_token', response.access_token);
+          localStorage.setItem('google_sheets_token', response.access_token);
         }
       },
     });
@@ -61,7 +62,7 @@ export class GoogleSignInService {
     // Store user in localStorage
     localStorage.setItem('google_user', JSON.stringify(this.user));
     
-    // Also request Sheets access
+    // Also request Sheets access immediately
     if (this.tokenClient) {
       this.tokenClient.requestAccessToken();
     }
