@@ -2,6 +2,9 @@ declare global {
   interface Window {
     google: any;
   }
+  interface Navigator {
+    standalone?: boolean;
+  }
 }
 
 export class GoogleSignInService {
@@ -88,6 +91,17 @@ export class GoogleSignInService {
   static async signIn() {
     if (!window.google?.accounts) {
       await this.initialize();
+    }
+    
+    // Check if running in standalone mode (iOS web app)
+    const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+    
+    if (isStandalone) {
+      // In standalone mode, redirect to regular browser for OAuth
+      const currentUrl = window.location.href;
+      const authUrl = `https://accounts.google.com/oauth/authorize?client_id=${this.CLIENT_ID}&redirect_uri=${encodeURIComponent(currentUrl)}&response_type=code&scope=${encodeURIComponent(this.SCOPES + ' openid email profile')}`;
+      window.location.href = authUrl;
+      return;
     }
     
     // Use OAuth flow directly to get both user info and Sheets access
