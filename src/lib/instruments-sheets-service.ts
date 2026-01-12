@@ -14,8 +14,15 @@ export class InstrumentsSheetsService {
 
   static async getAllInstruments(accessToken: string): Promise<InstrumentRecord[]> {
     try {
+      console.log('Instruments Sheet ID:', this.SHEET_ID);
+      console.log('Environment variable:', process.env.NEXT_PUBLIC_INSTRUMENTS_SHEET_ID);
       const response = await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${this.SHEET_ID}/values/${this.SHEET_NAME}!A:G?access_token=${accessToken}`
+        `https://sheets.googleapis.com/v4/spreadsheets/${this.SHEET_ID}/values/${this.SHEET_NAME}!A:G`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          }
+        }
       );
       
       if (!response.ok) {
@@ -64,10 +71,11 @@ export class InstrumentsSheetsService {
       };
       
       const response = await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${this.SHEET_ID}/values/${this.SHEET_NAME}!E${rowNumber}:G${rowNumber}?valueInputOption=RAW&access_token=${accessToken}`,
+        `https://sheets.googleapis.com/v4/spreadsheets/${this.SHEET_ID}/values/${this.SHEET_NAME}!E${rowNumber}:G${rowNumber}?valueInputOption=RAW`,
         {
           method: 'PUT',
           headers: {
+            'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(updateData)
@@ -105,10 +113,11 @@ export class InstrumentsSheetsService {
       ]);
       
       const response = await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${this.SHEET_ID}/values/${this.SHEET_NAME}!A2:G?valueInputOption=RAW&access_token=${accessToken}`,
+        `https://sheets.googleapis.com/v4/spreadsheets/${this.SHEET_ID}/values/${this.SHEET_NAME}!A2:G?valueInputOption=RAW`,
         {
           method: 'PUT',
           headers: {
+            'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ values: rows })
