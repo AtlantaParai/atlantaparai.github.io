@@ -32,13 +32,12 @@ jobs:
       
       - name: Create .env.local
         run: |
-          echo "NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}" >> .env.local
-          echo "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=atlantaparaiteam-1d660.firebaseapp.com" >> .env.local
-          echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID=atlantaparaiteam-1d660" >> .env.local
-          echo "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=atlantaparaiteam-1d660.firebasestorage.app" >> .env.local
-          echo "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=346334408700" >> .env.local
-          echo "NEXT_PUBLIC_FIREBASE_APP_ID=1:346334408700:web:69b710ecda69f4cbc44c79" >> .env.local
-          echo "NEXT_PUBLIC_GOOGLE_SHEET_ID=${{ secrets.GOOGLE_SHEET_ID }}" >> .env.local
+          echo "NEXT_PUBLIC_ATTENDANCE_SHEET_ID=${{ secrets.NEXT_PUBLIC_ATTENDANCE_SHEET_ID }}" >> .env.local
+          echo "NEXT_PUBLIC_INSTRUMENTS_SHEET_ID=${{ secrets.NEXT_PUBLIC_INSTRUMENTS_SHEET_ID }}" >> .env.local
+          echo "NEXT_PUBLIC_FINANCE_2025_ADULTS_SHEET_ID=${{ secrets.NEXT_PUBLIC_FINANCE_2025_ADULTS_SHEET_ID }}" >> .env.local
+          echo "NEXT_PUBLIC_FINANCE_2025_KIDS_TEENS_SHEET_ID=${{ secrets.NEXT_PUBLIC_FINANCE_2025_KIDS_TEENS_SHEET_ID }}" >> .env.local
+          echo "NEXT_PUBLIC_FINANCE_CORE_ADULTS_SHEET_ID=${{ secrets.NEXT_PUBLIC_FINANCE_CORE_ADULTS_SHEET_ID }}" >> .env.local
+          echo "NEXT_PUBLIC_FINANCE_CORE_TEENS_KIDS_SHEET_ID=${{ secrets.NEXT_PUBLIC_FINANCE_CORE_TEENS_KIDS_SHEET_ID }}" >> .env.local
           echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env.local
       
       - name: Build
