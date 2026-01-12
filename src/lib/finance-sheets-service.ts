@@ -1,10 +1,10 @@
 export class FinanceSheetsService {
   private static getSheetId(section: string): string {
     const sheetIds = {
-      '2025 Adults': '1uP3xkywry5K_Yo5K9yvviRI7bx6oC6JbYuEdMXTMNSg',
-      '2025 Kids Teens': '124RN9eEJ_uld7zUOC_ascolnZJpal8i5RCLnVpC8ye8',
-      'Core Adults': '1avpggbRPDyXLZw0qNzm1DhHGghxw2cunTbHH4lZmWaY',
-      'Core Teens Kids': '1LOcaZpx0lo54lm-AOanq7Y7MoXerteiNTbwgQFMiyCs'
+      '2025 Adults': process.env.NEXT_PUBLIC_FINANCE_2025_ADULTS_SHEET_ID || '1uP3xkywry5K_Yo5K9yvviRI7bx6oC6JbYuEdMXTMNSg',
+      '2025 Kids Teens': process.env.NEXT_PUBLIC_FINANCE_2025_KIDS_TEENS_SHEET_ID || '124RN9eEJ_uld7zUOC_ascolnZJpal8i5RCLnVpC8ye8',
+      'Core Adults': process.env.NEXT_PUBLIC_FINANCE_CORE_ADULTS_SHEET_ID || '1avpggbRPDyXLZw0qNzm1DhHGghxw2cunTbHH4lZmWaY',
+      'Core Teens Kids': process.env.NEXT_PUBLIC_FINANCE_CORE_TEENS_KIDS_SHEET_ID || '1LOcaZpx0lo54lm-AOanq7Y7MoXerteiNTbwgQFMiyCs'
     };
     return sheetIds[section as keyof typeof sheetIds] || sheetIds['Core Adults'];
   }

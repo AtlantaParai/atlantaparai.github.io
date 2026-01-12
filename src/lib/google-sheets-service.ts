@@ -1,5 +1,5 @@
 export class GoogleSheetsService {
-  private static SHEET_ID = process.env.NEXT_PUBLIC_GOOGLE_SHEET_ID || '';
+  private static SHEET_ID = process.env.NEXT_PUBLIC_ATTENDANCE_SHEET_ID || '';
   
   static async appendAttendanceRecord(data: {
     date: string;
