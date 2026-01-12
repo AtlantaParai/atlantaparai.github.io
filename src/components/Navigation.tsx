@@ -54,7 +54,7 @@ export default function Navigation() {
       </div>
       
       {/* Navigation Bar */}
-      <div className="bg-white bg-opacity-10 mt-2">
+      <div className="bg-gray-600 mt-2">
         <div className="max-w-6xl mx-auto px-6">
           <nav className="flex space-x-2">
             {navItems.map((item) => (
@@ -63,8 +63,8 @@ export default function Navigation() {
                 href={item.path}
                 className={`flex items-center gap-2 px-6 py-3 font-medium transition-all text-sm rounded-t-xl ${
                   isActive(item.path)
-                    ? 'text-blue-700 bg-white shadow-md'
-                    : 'text-white hover:text-blue-100 hover:bg-white hover:bg-opacity-20'
+                    ? 'text-gray-700 bg-white shadow-md'
+                    : 'text-white hover:text-gray-100 hover:bg-white hover:bg-opacity-20'
                 }`}
               >
                 <span>{item.icon}</span>

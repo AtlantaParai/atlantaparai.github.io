@@ -211,7 +211,12 @@ export default function FinanceTracker() {
             </div>
             <button
               onClick={resetPaymentStatus}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded-lg transition-colors text-sm"
+              disabled={user?.email !== 'ipan85@gmail.com'}
+              className={`px-2 py-1 rounded-lg transition-colors text-sm ${
+                user?.email !== 'ipan85@gmail.com'
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+              }`}
             >
               🔄 Reset
             </button>
@@ -250,10 +255,19 @@ export default function FinanceTracker() {
                 <button
                   key={member.id}
                   onClick={() => togglePaymentStatus(member)}
-                  className="w-full flex justify-between items-center p-2 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors text-sm"
+                  disabled={paymentStatus[member.name] === 'paid' && user?.email !== 'ipan85@gmail.com'}
+                  className={`w-full flex justify-between items-center p-2 border border-green-200 rounded-lg transition-colors text-sm ${
+                    paymentStatus[member.name] === 'paid' && user?.email !== 'ipan85@gmail.com'
+                      ? 'bg-gray-100 cursor-not-allowed opacity-50'
+                      : 'bg-green-50 hover:bg-green-100'
+                  }`}
                 >
-                  <span className="text-green-800 font-semibold">{member.name}</span>
-                  <span className="text-green-600">✅</span>
+                  <span className={`font-semibold ${
+                    paymentStatus[member.name] === 'paid' && user?.email !== 'ipan85@gmail.com'
+                      ? 'text-gray-500'
+                      : 'text-green-800'
+                  }`}>{member.name}</span>
+                  <span className={paymentStatus[member.name] === 'paid' && user?.email !== 'ipan85@gmail.com' ? 'text-gray-400' : 'text-green-600'}>✅</span>
                 </button>
               ))}
           </div>
