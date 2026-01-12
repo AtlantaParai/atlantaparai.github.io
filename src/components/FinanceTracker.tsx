@@ -182,7 +182,7 @@ export default function FinanceTracker() {
       )}
 
       {/* Controls */}
-      <div className="bg-white rounded-lg shadow-md p-3 mb-2">
+      <div className="bg-white rounded-lg shadow-lg p-3 mb-2">
         {/* Section Tabs */}
         <div className="grid grid-cols-4 gap-2">
           {Object.keys(sections).map((section) => (
@@ -202,7 +202,7 @@ export default function FinanceTracker() {
       </div>
 
       {/* Counts and Reset Button */}
-      <div className="bg-white rounded-lg shadow-md p-2 mb-2">
+      <div className="bg-white rounded-lg shadow-lg p-2 mb-2">
         <div className="flex justify-end items-center">
           <div className="flex items-center gap-4">
             <div className="flex gap-4">
@@ -222,7 +222,7 @@ export default function FinanceTracker() {
       {/* Members Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Unpaid Members */}
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white rounded-lg shadow-lg p-4">
           <h2 className="text-lg font-bold text-red-600 mb-2 text-center">Unpaid</h2>
           <div className="space-y-2">
             {getFilteredMembers()
@@ -241,7 +241,7 @@ export default function FinanceTracker() {
         </div>
 
         {/* Paid Members */}
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white rounded-lg shadow-lg p-4">
           <h2 className="text-lg font-bold text-green-600 mb-2 text-center">Paid</h2>
           <div className="space-y-2">
             {getFilteredMembers()

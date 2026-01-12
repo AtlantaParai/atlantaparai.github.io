@@ -32,20 +32,20 @@ export default function Navigation() {
             <img 
               src={process.env.NODE_ENV === 'production' ? '/APTWebsite/images/ATPLogo.png' : '/images/ATPLogo.png'} 
               alt="ATP Logo" 
-              className="h-16 w-16 object-contain rounded-full bg-white p-1" 
+              className="h-16 w-16 object-contain rounded-full bg-blue-600 p-1" 
             />
             <div>
-              <h1 className="text-2xl font-bold text-white">Atlanta Parai Team</h1>
-              <p className="text-blue-100 text-sm">Preserving Tamil Culture</p>
+              <h1 className="text-lg md:text-2xl font-bold text-white">Atlanta Parai Team</h1>
+              <p className="text-blue-100 text-xs md:text-sm">Preserving Tamil Culture</p>
             </div>
           </div>
           
           {/* User Info and Logout */}
           <div className="flex items-center gap-4">
-            <span className="text-sm text-blue-100">Welcome, {user?.name}</span>
+            <span className="text-xs md:text-sm text-blue-100">Welcome, {user?.name}</span>
             <button
               onClick={logout}
-              className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all text-sm font-medium"
+              className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-2 md:px-4 py-2 rounded-lg transition-all text-xs md:text-sm font-medium"
             >
               Sign Out
             </button>

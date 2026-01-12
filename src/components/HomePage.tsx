@@ -75,17 +75,17 @@ export default function HomePage() {
               <img 
                 src={`${basePath}/images/ATPLogo.png`} 
                 alt="Atlanta Parai Team" 
-                className="h-20 w-20 object-contain rounded-full bg-white p-2"
+                className="h-20 w-20 object-contain rounded-full bg-blue-600 p-2"
               />
               <div className="ml-4">
-                <h1 className="text-3xl font-bold text-white">Atlanta Parai Team</h1>
-                <p className="text-blue-100 text-lg">Preserving Tamil Culture Through Music</p>
+                <h1 className="text-xl md:text-3xl font-bold text-white">Atlanta Parai Team</h1>
+                <p className="text-blue-100 text-sm md:text-lg">Preserving Tamil Culture Through Music</p>
               </div>
             </div>
             <button
               onClick={handleConnectToSheets}
               disabled={isSigningIn}
-              className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 text-sm"
+              className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-2 md:px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 text-xs md:text-sm"
             >
               {isSigningIn ? 'Connecting...' : 'Admin Login'}
             </button>

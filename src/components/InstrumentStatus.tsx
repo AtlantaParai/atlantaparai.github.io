@@ -276,7 +276,7 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
           <p className="text-sm text-gray-600 mt-1">Loading instruments...</p>
         </div>
       )}
-      <div className="bg-white rounded-lg shadow-md p-2 mb-2">
+      <div className="bg-white rounded-lg shadow-lg p-2 mb-2">
         <div className="flex">
           <button
             onClick={() => handleTabChange('available')}
@@ -311,7 +311,7 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
 
       {showForceUpdate && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-4 w-80">
+          <div className="bg-white rounded-lg shadow-lg p-4 w-80">
             <h2 className="text-lg font-bold mb-3">Force Update Google Sheets?</h2>
             <p className="text-sm text-gray-600 mb-4">This will reinitialize the Google Sheet with current instrument data. Any checkout status will be lost.</p>
             <div className="flex gap-2">
@@ -334,7 +334,7 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
 
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
         {(activeTab === 'available' ? availableInstruments : checkedOutInstruments).map((instrument) => (
-          <div key={instrument.id} className="bg-white rounded-lg shadow-md overflow-hidden relative">
+          <div key={instrument.id} className="bg-white rounded-lg shadow-lg overflow-hidden relative">
             <div className="relative">
               <img 
                 src={instrument.image} 
@@ -394,7 +394,7 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
 
       {selectedInstrument && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-4 w-80 max-h-80">
+          <div className="bg-white rounded-lg shadow-lg p-4 w-80 max-h-80">
             <div className="flex justify-between items-center mb-3">
               <h2 className="text-lg font-bold">Check Out: {selectedInstrument.name}</h2>
               <button

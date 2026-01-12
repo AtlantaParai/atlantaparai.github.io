@@ -393,7 +393,7 @@ export default function AttendanceTracker() {
 
 
       {/* Controls */}
-      <div className="bg-white rounded-lg shadow-md p-3 mb-2">
+      <div className="bg-white rounded-lg shadow-lg p-3 mb-2">
         {/* Section Tabs */}
         <div className="grid grid-cols-4 gap-2">
           {Object.keys(sections).map((section) => (
@@ -413,7 +413,7 @@ export default function AttendanceTracker() {
       </div>
 
       {/* Counts and Buttons */}
-      <div className="bg-white rounded-lg shadow-md p-2 mb-2">
+      <div className="bg-white rounded-lg shadow-lg p-2 mb-2">
         <div className="flex justify-between items-center">
           <div className="flex gap-4">
             <span className="text-green-600 font-semibold">Present: {counts.present}</span>
@@ -439,7 +439,7 @@ export default function AttendanceTracker() {
       {/* Members Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Absent Members */}
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white rounded-lg shadow-lg p-4">
           <h2 className="text-lg font-bold text-red-600 mb-2 text-center">Absent</h2>
           <div className="space-y-2">
             {getFilteredMembers()
@@ -458,7 +458,7 @@ export default function AttendanceTracker() {
         </div>
 
         {/* Present Members */}
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white rounded-lg shadow-lg p-4">
           <h2 className="text-lg font-bold text-green-600 mb-2 text-center">Present</h2>
           <div className="space-y-2">
             {getFilteredMembers()
