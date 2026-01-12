@@ -64,7 +64,7 @@ export default function HomePage() {
     }
   };
 
-  const basePath = process.env.NODE_ENV === 'production' ? '/APTWebsite' : '';
+  const basePath = '';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
@@ -74,7 +74,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <img 
-                src={`${basePath}/images/ATPLogo.png`} 
+                src="/images/ATPLogo.png" 
                 alt="Atlanta Parai Team" 
                 className="h-20 w-20 object-contain rounded-full bg-blue-600 p-2"
               />
@@ -113,7 +113,7 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto relative">
           <div className="relative overflow-hidden rounded-lg shadow-lg bg-white">
             <img 
-              src={`${basePath}/images/${heroImages[currentImageIndex]}`} 
+              src={`/images/${heroImages[currentImageIndex]}`} 
               alt="Tamil Culture and Parai Performance" 
               className="w-full h-80 object-cover"
             />
@@ -165,7 +165,7 @@ export default function HomePage() {
             ].map((instrument, index) => (
               <div key={index} className="bg-white rounded-lg shadow-md p-4 text-center">
                 <img 
-                  src={`${basePath}/images/${instrument.image}`} 
+                  src={`/images/${instrument.image}`} 
                   alt={instrument.name}
                   className="w-full h-32 object-cover rounded-md mb-3"
                 />
@@ -196,7 +196,7 @@ export default function HomePage() {
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
               <img 
-                src={`${basePath}/images/Tamil_Culture.jpg`} 
+                src="/images/Tamil_Culture.jpg" 
                 alt="Tamil Culture and Parai Art" 
                 className="w-full h-64 object-cover rounded-lg shadow-md"
               />

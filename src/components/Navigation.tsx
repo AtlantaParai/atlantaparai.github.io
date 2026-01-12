@@ -29,9 +29,9 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-20">
           {/* Logo and Title */}
           <div className="flex items-center gap-4">
-            <a href={process.env.NODE_ENV === 'production' ? '/APTWebsite/' : '/'} className="flex items-center gap-4">
+            <a href="/" className="flex items-center gap-4">
               <img 
-                src={process.env.NODE_ENV === 'production' ? '/APTWebsite/images/ATPLogo.png' : '/images/ATPLogo.png'} 
+                src="/images/ATPLogo.png" 
                 alt="ATP Logo" 
                 className="h-16 w-16 object-contain rounded-full bg-blue-600 p-1 cursor-pointer" 
               />

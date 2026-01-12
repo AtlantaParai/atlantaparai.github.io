@@ -1,7 +1,7 @@
 'use client';
 
 export default function Footer() {
-  const basePath = process.env.NODE_ENV === 'production' ? '/APTWebsite' : '';
+  const basePath = '';
 
   return (
     <footer className="bg-gray-800 text-white py-6 mt-8">
@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center mb-4 md:mb-0">
             <img 
-              src={`${basePath}/images/ATPLogo.png`} 
+              src="/images/ATPLogo.png" 
               alt="Atlanta Parai Team" 
               className="h-12 w-12 object-contain mr-3"
             />
