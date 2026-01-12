@@ -75,7 +75,13 @@ export class GoogleSignInService {
       
       // Redirect to appropriate page based on user permissions
       const basePath = process.env.NODE_ENV === 'production' ? '/APTWebsite' : '';
-      window.location.href = `${basePath}/instruments`;
+      const currentUrl = window.location.href;
+      const targetUrl = `${window.location.origin}${basePath}/instruments`;
+      
+      console.log('Redirecting from:', currentUrl, 'to:', targetUrl);
+      
+      // Force a full page reload to ensure proper navigation
+      window.location.replace(targetUrl);
     } catch (error) {
       console.error('Failed to get user info:', error);
     }
