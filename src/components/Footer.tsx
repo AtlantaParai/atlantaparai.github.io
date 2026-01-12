@@ -11,7 +11,7 @@ export default function Footer() {
             <img 
               src="/images/ATPLogo.png" 
               alt="Atlanta Parai Team" 
-              className="h-12 w-12 object-contain mr-3"
+              className="h-12 w-12 object-contain mr-3 rounded-full bg-gray-600 p-1"
             />
             <div>
               <h3 className="text-lg font-bold">Atlanta Parai Team</h3>
