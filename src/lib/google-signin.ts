@@ -75,15 +75,7 @@ export class GoogleSignInService {
       
       // Redirect to appropriate page based on user permissions
       const basePath = process.env.NODE_ENV === 'production' ? '/APTWebsite' : '';
-      const { hasAttendanceAccess, hasFinanceAccess } = await import('./auth');
-      
-      if (hasAttendanceAccess(userInfo.email)) {
-        window.location.href = `${basePath}/attendance`;
-      } else if (hasFinanceAccess(userInfo.email)) {
-        window.location.href = `${basePath}/finance`;
-      } else {
-        window.location.href = `${basePath}/instruments`;
-      }
+      window.location.href = `${basePath}/instruments`;
     } catch (error) {
       console.error('Failed to get user info:', error);
     }
