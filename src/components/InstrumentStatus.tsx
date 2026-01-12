@@ -22,7 +22,6 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(false);
   const [showForceUpdate, setShowForceUpdate] = useState(false);
-  const [debugMessage, setDebugMessage] = useState('');
   const [oauthInitialized, setOauthInitialized] = useState(false);
   const [oauthReady, setOauthReady] = useState(false);
 
@@ -35,41 +34,28 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
   const loadInstrumentsFromSheets = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('Loading instruments from sheets...');
       
       const { GoogleOAuthService } = await import('@/lib/google-oauth');
       const accessToken = await GoogleOAuthService.getAccessToken();
-      console.log('Google Sheets token available:', !!accessToken);
-      setDebugMessage(`Token available: ${!!accessToken}`);
       
       if (!accessToken) {
-        console.log('No access token available - user needs to sign in');
-        setDebugMessage('No token - need to sign in');
         return;
       }
       
-      console.log('Loading instruments from Google Sheets...');
-      setDebugMessage('Loading from sheets...');
       const sheetsInstruments = await InstrumentsSheetsService.getAllInstruments(accessToken);
-      console.log('Sheets instruments found:', sheetsInstruments.length, sheetsInstruments);
-      setDebugMessage(`Found ${sheetsInstruments.length} instruments in sheet`);
       
       // If no instruments found, initialize the sheet
       if (sheetsInstruments.length === 0) {
-        console.log('No instruments found, initializing sheet...');
-        setDebugMessage('Initializing sheet with data...');
         await InstrumentsSheetsService.initializeInstruments(initialInstruments, accessToken);
         
         // Reload after initialization
         const newSheetsInstruments = await InstrumentsSheetsService.getAllInstruments(accessToken);
-        console.log('After initialization:', newSheetsInstruments.length, newSheetsInstruments);
-        setDebugMessage(`Initialized with ${newSheetsInstruments.length} instruments`);
         
         const mappedInstruments = newSheetsInstruments.map((sheet: any) => ({
           id: sheet.id,
           name: sheet.name,
           type: sheet.type,
-          image: sheet.image,
+          image: process.env.NODE_ENV === 'production' ? sheet.image.replace('/images/', './images/') : sheet.image,
           isCheckedOut: sheet.status === 'checked_out',
           checkedOutBy: sheet.checkedOutBy,
           checkedOutAt: sheet.checkedOutAt
@@ -82,14 +68,12 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
         id: sheet.id,
         name: sheet.name,
         type: sheet.type,
-        image: sheet.image,
+        image: process.env.NODE_ENV === 'production' ? sheet.image.replace('/images/', './images/') : sheet.image,
         isCheckedOut: sheet.status === 'checked_out',
         checkedOutBy: sheet.checkedOutBy,
         checkedOutAt: sheet.checkedOutAt
       }));
-      console.log('Mapped instruments:', mappedInstruments);
       setInstruments(mappedInstruments);
-      setDebugMessage(`Loaded ${mappedInstruments.length} instruments successfully`);
     } catch (error) {
       console.error('Failed to load from Google Sheets:', error);
     } finally {
@@ -118,7 +102,6 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
   useEffect(() => {
     // Refresh data when window gets focus (tab switching back)
     const handleFocus = () => {
-      console.log('Window focused, refreshing instruments...');
       loadInstrumentsFromSheets();
     };
     
@@ -158,11 +141,9 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
   const forceUpdateSheets = async () => {
     try {
       setLoading(true);
-      console.log('Force updating Google Sheets...');
       const { GoogleOAuthService } = await import('@/lib/google-oauth');
       const accessToken = await GoogleOAuthService.getAccessToken();
       if (!accessToken) {
-        console.error('No access token available');
         return;
       }
       
@@ -200,7 +181,6 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
       const accessToken = await GoogleOAuthService.getAccessToken();
       
       if (!accessToken) {
-        console.error('No access token available');
         return;
       }
       
@@ -241,7 +221,6 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
       const accessToken = await GoogleOAuthService.getAccessToken();
       
       if (!accessToken) {
-        console.error('No access token available');
         return;
       }
       
@@ -297,16 +276,11 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
           <p className="text-sm text-gray-600 mt-1">Loading instruments...</p>
         </div>
       )}
-      {debugMessage && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mb-2 text-center">
-          <p className="text-sm text-blue-800">Debug: {debugMessage}</p>
-        </div>
-      )}
       <div className="bg-white rounded-lg shadow-md p-2 mb-2">
         <div className="flex">
           <button
             onClick={() => handleTabChange('available')}
-            className={`flex-1 py-2 px-3 rounded-lg font-medium transition-colors text-sm ${
+            className={`flex-1 py-1 px-2 rounded-lg font-medium transition-colors text-xs ${
               activeTab === 'available' 
                 ? 'bg-green-500 text-white' 
                 : 'text-gray-600 hover:bg-gray-100'
@@ -316,7 +290,7 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
           </button>
           <button
             onClick={() => handleTabChange('checkedOut')}
-            className={`flex-1 py-2 px-3 rounded-lg font-medium transition-colors text-sm ${
+            className={`flex-1 py-1 px-2 rounded-lg font-medium transition-colors text-xs ${
               activeTab === 'checkedOut' 
                 ? 'bg-red-500 text-white' 
                 : 'text-gray-600 hover:bg-gray-100'

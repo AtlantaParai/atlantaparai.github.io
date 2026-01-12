@@ -10,8 +10,8 @@ export default function InstrumentsPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <main className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
       </main>
     );
   }
@@ -23,7 +23,7 @@ export default function InstrumentsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
       <Navigation />
       <InstrumentStatus initialInstruments={instruments} />
     </main>

@@ -10,6 +10,7 @@ export default function HomePage() {
   const { user } = useAuth();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
 
   const heroImages = [
     'TTS-Header-1-1280x720.jpg',
@@ -34,11 +35,22 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
+    if (!isAutoScrolling) return;
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
-    }, 2000);
+    }, 3000);
     return () => clearInterval(interval);
-  }, [heroImages.length]);
+  }, [heroImages.length, isAutoScrolling]);
+
+  const nextImage = () => {
+    setIsAutoScrolling(false);
+    setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
+  };
+
+  const prevImage = () => {
+    setIsAutoScrolling(false);
+    setCurrentImageIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+  };
 
   const handleConnectToSheets = async () => {
     setIsSigningIn(true);
@@ -56,24 +68,24 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
       {/* Header */}
-      <div className="bg-white shadow-sm">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <img 
                 src={`${basePath}/images/ATPLogo.png`} 
                 alt="Atlanta Parai Team" 
-                className="h-16 w-auto"
+                className="h-20 w-20 object-contain rounded-full bg-white p-2"
               />
               <div className="ml-4">
-                <h1 className="text-2xl font-bold text-red-600">Atlanta Parai Team</h1>
-                <p className="text-gray-600">Preserving Tamil Culture Through Music</p>
+                <h1 className="text-3xl font-bold text-white">Atlanta Parai Team</h1>
+                <p className="text-blue-100 text-lg">Preserving Tamil Culture Through Music</p>
               </div>
             </div>
             <button
               onClick={handleConnectToSheets}
               disabled={isSigningIn}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 text-sm"
+              className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 text-sm"
             >
               {isSigningIn ? 'Connecting...' : 'Admin Login'}
             </button>
@@ -97,16 +109,43 @@ export default function HomePage() {
           </p>
         </div>
         
-        <div className="w-full">
-          <img 
-            src={`${basePath}/images/${heroImages[currentImageIndex]}`} 
-            alt="Tamil Culture and Parai Performance" 
-            className="w-full h-96 object-cover rounded-lg shadow-lg"
-          />
+        <div className="max-w-5xl mx-auto relative">
+          <div className="relative overflow-hidden rounded-lg shadow-lg bg-white">
+            <img 
+              src={`${basePath}/images/${heroImages[currentImageIndex]}`} 
+              alt="Tamil Culture and Parai Performance" 
+              className="w-full h-80 object-cover"
+            />
+            <button 
+              onClick={prevImage}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70"
+            >
+              ←
+            </button>
+            <button 
+              onClick={nextImage}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70"
+            >
+              →
+            </button>
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+              {heroImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    setIsAutoScrolling(false);
+                    setCurrentImageIndex(index);
+                  }}
+                  className={`w-3 h-3 rounded-full ${
+                    index === currentImageIndex ? 'bg-white' : 'bg-white bg-opacity-50'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Instruments Gallery */}
-        <div className="max-w-7xl mx-auto mb-12">
+        <div className="max-w-6xl mx-auto">
           <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Our Traditional Instruments</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {[
@@ -135,8 +174,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* About Parai Culture */}
-        <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-6">
           <h3 className="text-2xl font-bold text-gray-800 mb-4">The Art of Parai</h3>
           <div className="grid md:grid-cols-2 gap-6 items-center">
             <div>
@@ -155,11 +193,13 @@ export default function HomePage() {
                 and ensuring that the art of Parai remains vibrant in the Tamil diaspora community.
               </p>
             </div>
-            <img 
-              src={`${basePath}/images/Tamil_Culture.jpg`} 
-              alt="Tamil Culture and Parai Art" 
-              className="rounded-lg shadow-md"
-            />
+            <div className="bg-gray-50 rounded-lg p-4">
+              <img 
+                src={`${basePath}/images/Tamil_Culture.jpg`} 
+                alt="Tamil Culture and Parai Art" 
+                className="w-full h-64 object-cover rounded-lg shadow-md"
+              />
+            </div>
           </div>
         </div>
       </div>

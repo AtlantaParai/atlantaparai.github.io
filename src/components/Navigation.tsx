@@ -23,26 +23,29 @@ export default function Navigation() {
   };
 
   return (
-    <header className="bg-white shadow-md border-b">
+    <header className="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg">
       {/* Top Header */}
       <div className="max-w-6xl mx-auto px-6">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           {/* Logo and Title */}
           <div className="flex items-center gap-4">
             <img 
               src={process.env.NODE_ENV === 'production' ? '/APTWebsite/images/ATPLogo.png' : '/images/ATPLogo.png'} 
               alt="ATP Logo" 
-              className="h-10 w-10" 
+              className="h-16 w-16 object-contain rounded-full bg-white p-1" 
             />
-            <h1 className="text-xl font-bold text-gray-800">Atlanta Parai Team</h1>
+            <div>
+              <h1 className="text-2xl font-bold text-white">Atlanta Parai Team</h1>
+              <p className="text-blue-100 text-sm">Preserving Tamil Culture</p>
+            </div>
           </div>
           
           {/* User Info and Logout */}
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">Welcome, {user?.name}</span>
+            <span className="text-sm text-blue-100">Welcome, {user?.name}</span>
             <button
               onClick={logout}
-              className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition-colors text-xs"
+              className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all text-sm font-medium"
             >
               Sign Out
             </button>
@@ -51,17 +54,17 @@ export default function Navigation() {
       </div>
       
       {/* Navigation Bar */}
-      <div className="bg-gray-50 border-t">
+      <div className="bg-white bg-opacity-10 mt-2">
         <div className="max-w-6xl mx-auto px-6">
-          <nav className="flex space-x-8">
+          <nav className="flex space-x-2">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 href={item.path}
-                className={`flex items-center gap-2 px-4 py-3 font-medium transition-colors text-sm border-b-2 ${
+                className={`flex items-center gap-2 px-6 py-3 font-medium transition-all text-sm rounded-t-xl ${
                   isActive(item.path)
-                    ? 'text-red-600 border-red-600 bg-white'
-                    : 'text-gray-600 hover:text-red-600 border-transparent hover:border-gray-300'
+                    ? 'text-blue-700 bg-white shadow-md'
+                    : 'text-white hover:text-blue-100 hover:bg-white hover:bg-opacity-20'
                 }`}
               >
                 <span>{item.icon}</span>
