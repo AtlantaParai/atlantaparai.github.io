@@ -10,10 +10,10 @@ export default function Navigation() {
   const { user, logout } = useAuth();
 
   const navItems = [
-    ...(user ? [{ name: 'Member Info', path: '/member-info', icon: '👤' }] : []),
-    { name: 'Instruments', path: '/instruments', icon: '🎵' },
-    ...(hasAttendanceAccess(user?.email || null) ? [{ name: 'Attendance', path: '/attendance', icon: '📋' }] : []),
-    ...(hasFinanceAccess(user?.email || null) ? [{ name: 'Finance', path: '/finance', icon: '💰' }] : [])
+    ...(user ? [{ name: 'Member Info', path: '/member-info' }] : []),
+    { name: 'Instruments', path: '/instruments' },
+    ...(hasAttendanceAccess(user?.email || null) ? [{ name: 'Attendance', path: '/attendance' }] : []),
+    ...(hasFinanceAccess(user?.email || null) ? [{ name: 'Finance', path: '/finance' }] : [])
   ];
 
   const isActive = (itemPath: string) => {
@@ -70,7 +70,6 @@ export default function Navigation() {
                     : 'text-white hover:text-gray-100 hover:bg-white hover:bg-opacity-20'
                 }`}
               >
-                <span>{item.icon}</span>
                 <span>{item.name}</span>
               </Link>
             ))}

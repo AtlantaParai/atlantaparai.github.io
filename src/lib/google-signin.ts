@@ -73,12 +73,8 @@ export class GoogleSignInService {
       
       localStorage.setItem('google_user', JSON.stringify(this.user));
       
-      // Redirect to appropriate page based on user permissions
-      
-      // Use setTimeout to ensure redirect happens after OAuth popup closes
-      setTimeout(() => {
-        window.location.href = '/member-info';
-      }, 100);
+      // Trigger a page reload to update AuthContext
+      window.location.reload();
     } catch (error) {
       console.error('Failed to get user info:', error);
     }

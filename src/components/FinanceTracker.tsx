@@ -8,6 +8,7 @@ import { adults2025 } from '@/data/2025Adults';
 import { kidsTeens2025 } from '@/data/2025KidsTeens';
 import { coreAdults } from '@/data/CoreAdults';
 import { coreTeensKids } from '@/data/CoreTeensKids';
+import FinanceQRScanner from '@/components/FinanceQRScanner';
 
 interface Member {
   id: string;
@@ -203,7 +204,10 @@ export default function FinanceTracker() {
 
       {/* Counts and Reset Button */}
       <div className="bg-white rounded-lg shadow-lg p-2 mb-2">
-        <div className="flex justify-end items-center">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <FinanceQRScanner />
+          </div>
           <div className="flex items-center gap-4">
             <div className="flex gap-4">
               <span className="text-green-600 font-semibold">Paid: {counts.paid}</span>
