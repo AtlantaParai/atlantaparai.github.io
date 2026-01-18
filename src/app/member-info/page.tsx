@@ -18,23 +18,9 @@ export default function MemberInfoPage() {
   }
 
   if (!user) {
-    return (
-      <main className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-md text-center max-w-md">
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <img src={process.env.NODE_ENV === 'production' ? '/APTWebsite/images/ATPLogo.png' : '/images/ATPLogo.png'} alt="ATP Logo" className="h-16 w-16" />
-            <div>
-              <h1 className="text-2xl font-bold text-red-600">Atlanta Parai Team</h1>
-              <p className="text-gray-600 text-sm">Preserving Tamil Culture</p>
-            </div>
-          </div>
-          <p className="text-gray-600 mb-6">Please log in to access your QR code</p>
-          <Link href="/" className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
-            Go to Login
-          </Link>
-        </div>
-      </main>
-    );
+    const basePath = process.env.NODE_ENV === 'production' ? '/APTWebsite' : '';
+    window.location.href = basePath + '/';
+    return null;
   }
 
   return (

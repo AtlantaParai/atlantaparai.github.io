@@ -1,4 +1,5 @@
 export const authorizedUsers = [
+  'ayyapps85@gmail.com',
   'ayyapps4u@gmail.com',
   'ipan85@gmail.com',
   'divyaavino@gmail.com',

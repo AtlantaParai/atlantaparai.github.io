@@ -211,6 +211,10 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
       setSelectedInstrument(null);
       setSearchQuery('');
       setFilteredMembers([]);
+      // Refresh page after checkout
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     }
   };
 
@@ -370,7 +374,7 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
                 <div className="bg-gray-50 rounded p-1 border-l-2 border-red-500">
                   <div className="flex items-center mb-1">
                     <span className="text-xs mr-1">👤</span>
-                    <span className="text-red-600 font-semibold text-xs truncate">{instrument.checkedOutBy}</span>
+                    <span className="text-red-600 font-semibold text-xs break-words">{instrument.checkedOutBy}</span>
                   </div>
                   <div className="flex items-center">
                     <span className="text-xs mr-1">📅</span>
@@ -402,6 +406,7 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
                   setSelectedInstrument(null);
                   setSearchQuery('');
                   setFilteredMembers([]);
+                  window.location.reload();
                 }}
                 className="bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs hover:bg-red-600"
               >

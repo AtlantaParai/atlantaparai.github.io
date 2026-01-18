@@ -60,7 +60,7 @@ export default function MemberInfo() {
   }
 
   return (
-    <div className="max-w-md mx-auto p-4">
+    <div className="flex items-center justify-center p-4 pt-8" style={{ minHeight: '50vh' }}>
       <div className="bg-white rounded-lg shadow-lg p-6 text-center">
         <h2 className="text-xl font-bold text-gray-800 mb-2">{member.name}</h2>
         <p className="text-gray-600 mb-2">{member.batch}</p>
