@@ -19,8 +19,7 @@ export default function InstrumentsPage() {
   }
 
   if (!user || !isUserAuthorized(user.email)) {
-    const basePath = process.env.NODE_ENV === 'production' ? '/APTWebsite' : '';
-    window.location.href = basePath + '/';
+    window.location.href = '/';
     return null;
   }
 
