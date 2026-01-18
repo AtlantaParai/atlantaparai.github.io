@@ -30,9 +30,12 @@ export class MemberSignInService {
   private static setupSignIn() {
     this.tokenClient = window.google.accounts.oauth2.initTokenClient({
       client_id: this.CLIENT_ID,
-      scope: 'openid email profile',
+      scope: 'https://www.googleapis.com/auth/spreadsheets openid email profile',
       callback: (response: any) => {
         if (response.access_token) {
+          // Store the access token for Sheets access
+          localStorage.setItem('google_access_token', response.access_token);
+          localStorage.setItem('google_sheets_token', response.access_token);
           this.getUserInfo(response.access_token);
         }
       },
@@ -77,7 +80,7 @@ export class MemberSignInService {
       
       setTimeout(() => {
         window.location.href = '/member-info';
-      }, 100);
+      }, 500);
     } catch (error) {
       console.error('Failed to get user info:', error);
     }

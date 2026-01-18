@@ -80,11 +80,10 @@ export default function FinanceQRScanner() {
       setScanResult(`Scanned: ${memberData.name} (${memberData.batch})`);
       await markPayment(memberData.name, memberData.batch);
       
+      // Reset hasScanned after 2 seconds to allow next scan
       setTimeout(() => {
-        stopScanner();
-        // Store current URL to preserve tab state
-        const currentUrl = window.location.href;
-        window.location.href = currentUrl;
+        setHasScanned(false);
+        setScanResult('Camera ready - point at next QR code');
       }, 2000);
     } catch (error) {
       setScanResult('❌ Invalid QR code format');

@@ -19,6 +19,7 @@ export default function InstrumentsPage() {
   }
 
   if (!user || !isUserAuthorized(user.email)) {
+    console.log('Instruments access denied:', { user: user?.email, authorized: isUserAuthorized(user?.email || null) });
     const basePath = process.env.NODE_ENV === 'production' ? '/APTWebsite' : '';
     window.location.href = basePath + '/';
     return null;

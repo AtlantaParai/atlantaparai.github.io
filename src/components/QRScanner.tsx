@@ -83,7 +83,11 @@ export default function QRScanner() {
       setScanResult(`Scanned: ${memberData.name} (${memberData.batch})`);
       await markAttendance(memberData.name, memberData.batch);
       
-      setTimeout(stopScanner, 2000);
+      // Reset hasScanned after 2 seconds to allow next scan
+      setTimeout(() => {
+        setHasScanned(false);
+        setScanResult('Camera ready - point at next QR code');
+      }, 2000);
     } catch (error) {
       setScanResult('❌ Invalid QR code format');
     }

@@ -105,7 +105,7 @@ export default function HomePage() {
               <button
                 onClick={handleAdminLogin}
                 disabled={isSigningIn}
-                className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-2 md:px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 text-xs md:text-sm"
+                className="bg-red-700 hover:bg-red-800 text-white px-2 md:px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 text-xs md:text-sm"
               >
                 {isSigningIn ? 'Connecting...' : 'Admin Login'}
               </button>
