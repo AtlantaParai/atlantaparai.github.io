@@ -99,8 +99,8 @@ export default function AttendanceTracker() {
       const currentHour = estTime.getHours();
       const currentMinute = estTime.getMinutes();
       
-      // Check if it's exactly 7:49 PM EST
-      if (currentHour === 19 && currentMinute === 49 && oauthReady && user) {
+      // Check if it's Sunday at 7:49 PM EST
+      if (estTime.getDay() === 0 && currentHour === 19 && currentMinute === 49 && oauthReady && user) {
         console.log('Auto-absence triggered at 7:49 PM EST');
         try {
           const accessToken = await GoogleOAuthService.getAccessToken();
