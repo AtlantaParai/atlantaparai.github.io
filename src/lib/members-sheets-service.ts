@@ -1,5 +1,5 @@
 export class MembersSheetsService {
-  private static SHEET_ID = '1SUKDVM_5zm46jKuwqMU5Wu05AsP2sGXKo2Cu6aH58No';
+  private static SHEET_ID = process.env.NEXT_PUBLIC_MEMBERS_SHEET_ID || '';
   
   static async getMemberPermissions(accessToken: string) {
     console.log('Fetching member permissions from sheet:', this.SHEET_ID);
