@@ -64,7 +64,7 @@ Create a collection called `instruments` with documents containing:
 4. The workflow will automatically deploy on push to main branch
 5. Your site will be available at `https://atlantaparai.github.io/`
 
-cd /Users/ayyappsmacbook/Documents/APT/APTWebsite && git add . && git commit -m "Fix instruments auth check to use AuthContext" && git push origin main
+cd /Users/ayyappsmacbook/Documents/APT/APTWebsite && git add . && git commit -m "Fix instruments addition" && git push origin main
 
 ### 5. Local Development
 
