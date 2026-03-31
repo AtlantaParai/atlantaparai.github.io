@@ -152,5 +152,23 @@ export const instruments: Instrument[] = [
     isCheckedOut: false,
     checkedOutBy: null,
     checkedOutAt: null
-  }
+  },
+  {
+    id: '17',
+    name: 'Jaalra 2',
+    type: 'Jaalra 2',
+    image: '/images/Jaalra 2.jpeg',
+    isCheckedOut: false,
+    checkedOutBy: null,
+    checkedOutAt: null
+  },
+  {
+    id: '18',
+    name: 'Thudumbu 3',
+    type: 'Thudumbu',
+    image: '/images/Thudumbu 3.jpeg',
+    isCheckedOut: false,
+    checkedOutBy: null,
+    checkedOutAt: null
+  },
 ];
