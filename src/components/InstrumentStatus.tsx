@@ -122,7 +122,7 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
       }
 
       // Deduplicate and sort
-      const unique = [...new Set(allNames)].sort();
+      const unique = Array.from(new Set(allNames)).sort();
       console.log(`Instruments member list: ${allNames.length} total, ${unique.length} unique`);
       setAllMembers(unique);
     } catch (error) {
