@@ -5,10 +5,9 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { instruments } from '@/data/instruments';
 import { useAuth } from '@/contexts/AuthContext';
-import { isUserAuthorized } from '@/lib/auth';
 
 export default function InstrumentsPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, isAuthorized } = useAuth();
 
   if (loading) {
     return (
@@ -18,7 +17,7 @@ export default function InstrumentsPage() {
     );
   }
 
-  if (!user || !isUserAuthorized(user.email)) {
+  if (!user || !isAuthorized) {
     window.location.href = '/';
     return null;
   }
