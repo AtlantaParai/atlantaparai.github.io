@@ -57,4 +57,41 @@ export class MembersSheetsService {
     const permissions = await this.getMemberPermissions(accessToken);
     return permissions.authorizedEmails;
   }
+
+  static async getAllMemberNames(accessToken: string): Promise<string[]> {
+    const response = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${this.SHEET_ID}/values/Login`,
+      {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      }
+    );
+
+    if (!response.ok) throw new Error(`Failed to fetch members: ${response.status}`);
+
+    const data = await response.json();
+    const rows = data.values || [];
+
+    return rows.slice(1)
+      .map((row: string[]) => row[0]?.trim())
+      .filter(Boolean);
+  }
+
+  static async getMemberNamesFromSheet(sheetId: string, accessToken: string): Promise<string[]> {
+    const response = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!C:C`,
+      {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      }
+    );
+
+    if (!response.ok) throw new Error(`Failed to fetch members from sheet ${sheetId}: ${response.status}`);
+
+    const data = await response.json();
+    const rows = data.values || [];
+
+    return rows.slice(1)
+      .filter((_: string[], index: number) => index !== 4) // skip row 6 (index 4 after slice(1))
+      .map((row: string[]) => row[0]?.trim())
+      .filter((name): name is string => !!name && !name.toLowerCase().includes('group'));
+  }
 }

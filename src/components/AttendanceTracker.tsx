@@ -4,10 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { GoogleSheetsService } from '@/lib/google-sheets-service';
 import { GoogleOAuthService } from '@/lib/google-oauth';
-import { adults2025 } from '@/data/2025Adults';
-import { kidsTeens2025 } from '@/data/2025KidsTeens';
-import { coreAdults } from '@/data/CoreAdults';
-import { coreTeensKids } from '@/data/CoreTeensKids';
+import { MembersSheetsService } from '@/lib/members-sheets-service';
 import QRScanner from '@/components/QRScanner';
 
 interface Member {
@@ -39,11 +36,14 @@ export default function AttendanceTracker() {
 
   const { user } = useAuth();
 
-  const sections = {
-    '2025 Adults': adults2025.map((name, index) => ({ id: `2025adults-${index + 1}`, name })),
-    '2025 Kids Teens': kidsTeens2025.map((name, index) => ({ id: `2025kidsteens-${index + 1}`, name })),
-    'Core Adults': coreAdults.map((name, index) => ({ id: `coreadults-${index + 1}`, name })),
-    'Core Teens Kids': coreTeensKids.map((name, index) => ({ id: `coreteenskids-${index + 1}`, name })),
+  const [sections, setSections] = useState<Record<string, Member[]>>({});
+  const [sectionsLoaded, setSectionsLoaded] = useState(false);
+
+  const sectionSheetIds: Record<string, string> = {
+    '2025 Adults': process.env.NEXT_PUBLIC_FINANCE_2025_ADULTS_SHEET_ID || '',
+    '2025 Kids Teens': process.env.NEXT_PUBLIC_FINANCE_2025_KIDS_TEENS_SHEET_ID || '',
+    'Core Adults': process.env.NEXT_PUBLIC_FINANCE_CORE_ADULTS_SHEET_ID || '',
+    'Core Teens Kids': process.env.NEXT_PUBLIC_FINANCE_CORE_TEENS_KIDS_SHEET_ID || '',
   };
 
   useEffect(() => {
@@ -57,7 +57,30 @@ export default function AttendanceTracker() {
   }, []);
 
   useEffect(() => {
-    if (oauthReady) {
+    if (oauthReady && !sectionsLoaded) {
+      loadSectionMembers();
+    }
+  }, [oauthReady]);
+
+  const loadSectionMembers = async () => {
+    try {
+      const accessToken = await GoogleOAuthService.getAccessToken();
+      if (!accessToken) return;
+
+      const loaded: Record<string, Member[]> = {};
+      for (const [section, sheetId] of Object.entries(sectionSheetIds)) {
+        const names = await MembersSheetsService.getMemberNamesFromSheet(sheetId, accessToken);
+        loaded[section] = names.map((name, index) => ({ id: `${section}-${index + 1}`, name }));
+      }
+      setSections(loaded);
+      setSectionsLoaded(true);
+    } catch (error) {
+      console.error('Failed to load section members:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (oauthReady && sectionsLoaded) {
       loadTodayAttendance();
       
       // Pull-to-refresh functionality
@@ -89,7 +112,7 @@ export default function AttendanceTracker() {
         document.removeEventListener('touchmove', handleTouchMove);
       };
     }
-  }, [selectedSection, oauthReady]);
+  }, [selectedSection, oauthReady, sectionsLoaded]);
 
   // Auto-absence at 7:49 PM EST
   useEffect(() => {
@@ -116,7 +139,7 @@ export default function AttendanceTracker() {
             // Only mark absent if there were some attendance records today (indicating a meeting)
             if (todayRecords.length > 0) {
               const presentMembers = new Set(todayRecords.map((r: any) => r.memberName));
-              const sectionMembers = sections[section as keyof typeof sections];
+              const sectionMembers = sections[section] || [];
               
               console.log(`Section ${section}: ${presentMembers.size} present, ${sectionMembers.length - presentMembers.size} to mark absent`);
               

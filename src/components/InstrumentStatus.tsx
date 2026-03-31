@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Instrument } from '@/data/instruments';
-import { Member, membersList } from '@/data/members';
 import { InstrumentsSheetsService } from '@/lib/instruments-sheets-service';
+import { MembersSheetsService } from '@/lib/members-sheets-service';
 import { GoogleSignInService } from '@/lib/google-signin';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -19,7 +19,8 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
   const [activeTab, setActiveTab] = useState<'available' | 'checkedOut'>('available');
   const [selectedInstrument, setSelectedInstrument] = useState<Instrument | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
+  const [allMembers, setAllMembers] = useState<string[]>([]);
+  const [filteredMembers, setFilteredMembers] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [showForceUpdate, setShowForceUpdate] = useState(false);
   const [oauthInitialized, setOauthInitialized] = useState(false);
@@ -96,8 +97,38 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
   useEffect(() => {
     if (oauthReady) {
       loadInstrumentsFromSheets();
+      loadMembers();
     }
   }, [loadInstrumentsFromSheets, oauthReady]);
+
+  const loadMembers = async () => {
+    try {
+      const { GoogleOAuthService } = await import('@/lib/google-oauth');
+      const accessToken = await GoogleOAuthService.getAccessToken();
+      if (!accessToken) return;
+
+      const sheetIds = [
+        process.env.NEXT_PUBLIC_FINANCE_2025_ADULTS_SHEET_ID || '',
+        process.env.NEXT_PUBLIC_FINANCE_2025_KIDS_TEENS_SHEET_ID || '',
+        process.env.NEXT_PUBLIC_FINANCE_CORE_ADULTS_SHEET_ID || '',
+        process.env.NEXT_PUBLIC_FINANCE_CORE_TEENS_KIDS_SHEET_ID || '',
+      ];
+
+      const allNames: string[] = [];
+      for (const sheetId of sheetIds) {
+        if (!sheetId) continue;
+        const names = await MembersSheetsService.getMemberNamesFromSheet(sheetId, accessToken);
+        allNames.push(...names);
+      }
+
+      // Deduplicate and sort
+      const unique = [...new Set(allNames)].sort();
+      console.log(`Instruments member list: ${allNames.length} total, ${unique.length} unique`);
+      setAllMembers(unique);
+    } catch (error) {
+      console.error('Failed to load members:', error);
+    }
+  };
 
   useEffect(() => {
     // Refresh data when window gets focus (tab switching back)
@@ -163,16 +194,15 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
   const handleSearchChange = (text: string) => {
     setSearchQuery(text);
     if (text.length > 0) {
-      const filtered = membersList.filter(member => 
-        member.name.toLowerCase().includes(text.toLowerCase())
-      );
-      setFilteredMembers(filtered);
+      setFilteredMembers(allMembers.filter(name => 
+        name.toLowerCase().includes(text.toLowerCase())
+      ));
     } else {
-      setFilteredMembers([]);
+      setFilteredMembers(allMembers);
     }
   };
 
-  const handleCheckout = async (member: Member) => {
+  const handleCheckout = async (memberName: string) => {
     if (!selectedInstrument) return;
     
     try {
@@ -187,7 +217,7 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
       await InstrumentsSheetsService.updateInstrumentStatus(
         selectedInstrument.id,
         'checked_out',
-        member.name,
+        memberName,
         accessToken
       );
       
@@ -196,7 +226,7 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
           return {
             ...inst,
             isCheckedOut: true,
-            checkedOutBy: member.name,
+            checkedOutBy: memberName,
             checkedOutAt: new Date().toISOString()
           };
         }
@@ -385,7 +415,10 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
                 </div>
               ) : (
                 <button
-                  onClick={() => setSelectedInstrument(instrument)}
+                  onClick={() => {
+                    setSelectedInstrument(instrument);
+                    setFilteredMembers(allMembers);
+                  }}
                   className="w-full bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded transition-colors text-xs"
                 >
                   Check Out
@@ -407,7 +440,7 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
             }}
           ></div>
           
-          <div className="relative bg-white rounded-lg shadow-2xl w-80 max-h-[80vh] flex flex-col animate-pop-in">
+          <div className="relative bg-white rounded-lg shadow-2xl w-96 max-h-[80vh] flex flex-col animate-pop-in">
             <div className="p-4 border-b">
               <div className="flex justify-between items-center mb-3">
                 <h2 className="text-lg font-bold">Check Out: {selectedInstrument.name}</h2>
@@ -435,16 +468,16 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
             </div>
               
             <div className="flex-1 overflow-y-auto p-4">
-                {filteredMembers.map((member) => (
+                {filteredMembers.map((name, index) => (
                   <button
-                    key={member.id}
-                    onClick={() => handleCheckout(member)}
+                    key={index}
+                    onClick={() => handleCheckout(name)}
                     className="w-full flex items-center p-2 hover:bg-gray-100 rounded-lg border-b border-gray-200 text-sm"
                   >
                     <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center mr-2 text-xs font-bold">
-                      {member.name.charAt(0)}
+                      {name.charAt(0)}
                     </div>
-                    <span className="text-gray-800">{member.name}</span>
+                    <span className="text-gray-800 text-left break-words">{name}</span>
                   </button>
                 ))}
             </div>
