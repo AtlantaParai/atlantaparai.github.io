@@ -92,6 +92,6 @@ export class MembersSheetsService {
     return rows.slice(1)
       .filter((_: string[], index: number) => index !== 4) // skip row 6 (index 4 after slice(1))
       .map((row: string[]) => row[0]?.trim())
-      .filter((name): name is string => !!name && !name.toLowerCase().includes('group'));
+      .filter((name: string | undefined): name is string => !!name && !name.toLowerCase().includes('group'));
   }
 }
