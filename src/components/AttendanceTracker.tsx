@@ -26,7 +26,7 @@ interface AbsenceReport {
 }
 
 export default function AttendanceTracker() {
-  const [selectedSection, setSelectedSection] = useState('2025 Adults');
+  const [selectedSection, setSelectedSection] = useState('Core Adults');
   const [attendanceStatus, setAttendanceStatus] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [oauthReady, setOauthReady] = useState(false);
@@ -39,11 +39,9 @@ export default function AttendanceTracker() {
   const [sections, setSections] = useState<Record<string, Member[]>>({});
   const [sectionsLoaded, setSectionsLoaded] = useState(false);
 
-  const sectionSheetIds: Record<string, string> = {
-    '2025 Adults': process.env.NEXT_PUBLIC_FINANCE_2025_ADULTS_SHEET_ID || '',
-    '2025 Kids Teens': process.env.NEXT_PUBLIC_FINANCE_2025_KIDS_TEENS_SHEET_ID || '',
-    'Core Adults': process.env.NEXT_PUBLIC_FINANCE_CORE_ADULTS_SHEET_ID || '',
-    'Core Teens Kids': process.env.NEXT_PUBLIC_FINANCE_CORE_TEENS_KIDS_SHEET_ID || '',
+  const sectionSheetIds: Record<string, { id: string; tab: string }> = {
+    'Core Adults': { id: process.env.NEXT_PUBLIC_FINANCE_CORE_ADULTS_SHEET_ID || '', tab: 'Adult Core Team' },
+    'Core Teens Kids': { id: process.env.NEXT_PUBLIC_FINANCE_CORE_TEENS_KIDS_SHEET_ID || '', tab: 'APT Core Teens' },
   };
 
   useEffect(() => {
@@ -68,8 +66,8 @@ export default function AttendanceTracker() {
       if (!accessToken) return;
 
       const loaded: Record<string, Member[]> = {};
-      for (const [section, sheetId] of Object.entries(sectionSheetIds)) {
-        const names = await MembersSheetsService.getMemberNamesFromSheet(sheetId, accessToken);
+      for (const [section, { id, tab }] of Object.entries(sectionSheetIds)) {
+        const names = await MembersSheetsService.getMemberNamesFromSheet(id, accessToken, tab);
         loaded[section] = names.map((name, index) => ({ id: `${section}-${index + 1}`, name }));
       }
       setSections(loaded);
@@ -419,7 +417,7 @@ export default function AttendanceTracker() {
       {/* Controls */}
       <div className="bg-white rounded-lg shadow-lg p-3 mb-2">
         {/* Section Tabs */}
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {Object.keys(sections).map((section) => (
             <button
               key={section}

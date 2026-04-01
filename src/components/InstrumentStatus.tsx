@@ -107,17 +107,15 @@ export default function InstrumentStatus({ initialInstruments }: InstrumentStatu
       const accessToken = await GoogleOAuthService.getAccessToken();
       if (!accessToken) return;
 
-      const sheetIds = [
-        process.env.NEXT_PUBLIC_FINANCE_2025_ADULTS_SHEET_ID || '',
-        process.env.NEXT_PUBLIC_FINANCE_2025_KIDS_TEENS_SHEET_ID || '',
-        process.env.NEXT_PUBLIC_FINANCE_CORE_ADULTS_SHEET_ID || '',
-        process.env.NEXT_PUBLIC_FINANCE_CORE_TEENS_KIDS_SHEET_ID || '',
+      const sheets = [
+        { id: process.env.NEXT_PUBLIC_FINANCE_CORE_ADULTS_SHEET_ID || '', tab: 'Adult Core Team' },
+        { id: process.env.NEXT_PUBLIC_FINANCE_CORE_TEENS_KIDS_SHEET_ID || '', tab: 'APT Core Teens' },
       ];
 
       const allNames: string[] = [];
-      for (const sheetId of sheetIds) {
-        if (!sheetId) continue;
-        const names = await MembersSheetsService.getMemberNamesFromSheet(sheetId, accessToken);
+      for (const { id, tab } of sheets) {
+        if (!id) continue;
+        const names = await MembersSheetsService.getMemberNamesFromSheet(id, accessToken, tab);
         allNames.push(...names);
       }
 

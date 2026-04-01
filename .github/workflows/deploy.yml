@@ -34,8 +34,6 @@ jobs:
         run: |
           echo "NEXT_PUBLIC_ATTENDANCE_SHEET_ID=${{ secrets.NEXT_PUBLIC_ATTENDANCE_SHEET_ID }}" >> .env.local
           echo "NEXT_PUBLIC_INSTRUMENTS_SHEET_ID=${{ secrets.NEXT_PUBLIC_INSTRUMENTS_SHEET_ID }}" >> .env.local
-          echo "NEXT_PUBLIC_FINANCE_2025_ADULTS_SHEET_ID=${{ secrets.NEXT_PUBLIC_FINANCE_2025_ADULTS_SHEET_ID }}" >> .env.local
-          echo "NEXT_PUBLIC_FINANCE_2025_KIDS_TEENS_SHEET_ID=${{ secrets.NEXT_PUBLIC_FINANCE_2025_KIDS_TEENS_SHEET_ID }}" >> .env.local
           echo "NEXT_PUBLIC_FINANCE_CORE_ADULTS_SHEET_ID=${{ secrets.NEXT_PUBLIC_FINANCE_CORE_ADULTS_SHEET_ID }}" >> .env.local
           echo "NEXT_PUBLIC_FINANCE_CORE_TEENS_KIDS_SHEET_ID=${{ secrets.NEXT_PUBLIC_FINANCE_CORE_TEENS_KIDS_SHEET_ID }}" >> .env.local
           echo "NEXT_PUBLIC_MEMBERS_SHEET_ID=${{ secrets.NEXT_PUBLIC_MEMBERS_SHEET_ID }}" >> .env.local

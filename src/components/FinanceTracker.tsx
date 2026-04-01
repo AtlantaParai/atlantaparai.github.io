@@ -4,10 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { GoogleOAuthService } from '@/lib/google-oauth';
 import { FinanceSheetsService } from '@/lib/finance-sheets-service';
-import { adults2025 } from '@/data/2025Adults';
-import { kidsTeens2025 } from '@/data/2025KidsTeens';
-import { coreAdults } from '@/data/CoreAdults';
-import { coreTeensKids } from '@/data/CoreTeensKids';
+import { MembersSheetsService } from '@/lib/members-sheets-service';
 import FinanceQRScanner from '@/components/FinanceQRScanner';
 
 interface Member {
@@ -21,18 +18,18 @@ interface PaymentRecord {
 }
 
 export default function FinanceTracker() {
-  const [selectedSection, setSelectedSection] = useState('2025 Adults');
+  const [selectedSection, setSelectedSection] = useState('Core Adults');
   const [paymentStatus, setPaymentStatus] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [oauthReady, setOauthReady] = useState(false);
   const [oauthInitialized, setOauthInitialized] = useState(false);
+  const [sections, setSections] = useState<Record<string, Member[]>>({});
+  const [sectionsLoaded, setSectionsLoaded] = useState(false);
   const { user } = useAuth();
 
-  const sections = {
-    '2025 Adults': adults2025.map((name, index) => ({ id: `2025adults-${index + 1}`, name })),
-    '2025 Kids Teens': kidsTeens2025.map((name, index) => ({ id: `2025kidsteens-${index + 1}`, name })),
-    'Core Adults': coreAdults.map((name, index) => ({ id: `coreadults-${index + 1}`, name })),
-    'Core Teens Kids': coreTeensKids.map((name, index) => ({ id: `coreteenskids-${index + 1}`, name })),
+  const sectionSheetIds: Record<string, { id: string; tab: string }> = {
+    'Core Adults': { id: process.env.NEXT_PUBLIC_FINANCE_CORE_ADULTS_SHEET_ID || '', tab: 'Adult Core Team' },
+    'Core Teens Kids': { id: process.env.NEXT_PUBLIC_FINANCE_CORE_TEENS_KIDS_SHEET_ID || '', tab: 'APT Core Teens' },
   };
 
   useEffect(() => {
@@ -40,14 +37,36 @@ export default function FinanceTracker() {
       setOauthInitialized(true);
       GoogleOAuthService.initialize().then(async () => {
         setOauthReady(true);
-        // Trigger OAuth flow immediately if no token exists
         await GoogleOAuthService.getAccessToken();
       });
     }
   }, []);
 
   useEffect(() => {
-    if (oauthReady) {
+    if (oauthReady && !sectionsLoaded) {
+      loadSectionMembers();
+    }
+  }, [oauthReady]);
+
+  const loadSectionMembers = async () => {
+    try {
+      const accessToken = await GoogleOAuthService.getAccessToken();
+      if (!accessToken) return;
+
+      const loaded: Record<string, Member[]> = {};
+      for (const [section, { id, tab }] of Object.entries(sectionSheetIds)) {
+        const names = await MembersSheetsService.getMemberNamesFromSheet(id, accessToken, tab);
+        loaded[section] = names.map((name, index) => ({ id: `${section}-${index + 1}`, name }));
+      }
+      setSections(loaded);
+      setSectionsLoaded(true);
+    } catch (error) {
+      console.error('Failed to load section members:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (oauthReady && sectionsLoaded) {
       loadPaymentStatus();
       
       // Pull-to-refresh functionality
@@ -79,7 +98,7 @@ export default function FinanceTracker() {
         document.removeEventListener('touchmove', handleTouchMove);
       };
     }
-  }, [selectedSection, oauthReady]);
+  }, [selectedSection, oauthReady, sectionsLoaded]);
 
   // Reload data when tab becomes visible/focused
   useEffect(() => {
@@ -185,7 +204,7 @@ export default function FinanceTracker() {
       {/* Controls */}
       <div className="bg-white rounded-lg shadow-lg p-3 mb-2">
         {/* Section Tabs */}
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {Object.keys(sections).map((section) => (
             <button
               key={section}

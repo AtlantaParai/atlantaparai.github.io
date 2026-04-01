@@ -76,9 +76,9 @@ export class MembersSheetsService {
       .filter(Boolean);
   }
 
-  static async getMemberNamesFromSheet(sheetId: string, accessToken: string): Promise<string[]> {
+  static async getMemberNamesFromSheet(sheetId: string, accessToken: string, tabName: string = 'Sheet1'): Promise<string[]> {
     const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!C:C`,
+      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(tabName)}`,
       {
         headers: { 'Authorization': `Bearer ${accessToken}` }
       }
@@ -89,9 +89,13 @@ export class MembersSheetsService {
     const data = await response.json();
     const rows = data.values || [];
 
+    // Column J (index 9) for adults, Column I (index 8) for teens
+    const naCol = tabName === 'APT Core Teens' ? 8 : 9;
+
     return rows.slice(1)
-      .filter((_: string[], index: number) => index !== 4) // skip row 6 (index 4 after slice(1))
-      .map((row: string[]) => row[0]?.trim())
+      .filter((_: string[], index: number) => index !== 4) // skip row 6
+      .filter((row: string[]) => (row[naCol]?.trim().toUpperCase() || '') !== 'N/A')
+      .map((row: string[]) => row[2]?.trim())
       .filter((name: string | undefined): name is string => !!name && !name.toLowerCase().includes('group'));
   }
 }

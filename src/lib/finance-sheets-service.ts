@@ -1,35 +1,38 @@
 export class FinanceSheetsService {
   private static getSheetId(section: string): string {
     const sheetIds = {
-      '2025 Adults': process.env.NEXT_PUBLIC_FINANCE_2025_ADULTS_SHEET_ID || '1uP3xkywry5K_Yo5K9yvviRI7bx6oC6JbYuEdMXTMNSg',
-      '2025 Kids Teens': process.env.NEXT_PUBLIC_FINANCE_2025_KIDS_TEENS_SHEET_ID || '124RN9eEJ_uld7zUOC_ascolnZJpal8i5RCLnVpC8ye8',
-      'Core Adults': process.env.NEXT_PUBLIC_FINANCE_CORE_ADULTS_SHEET_ID || '1avpggbRPDyXLZw0qNzm1DhHGghxw2cunTbHH4lZmWaY',
-      'Core Teens Kids': process.env.NEXT_PUBLIC_FINANCE_CORE_TEENS_KIDS_SHEET_ID || '1LOcaZpx0lo54lm-AOanq7Y7MoXerteiNTbwgQFMiyCs'
+      'Core Adults': process.env.NEXT_PUBLIC_FINANCE_CORE_ADULTS_SHEET_ID || '',
+      'Core Teens Kids': process.env.NEXT_PUBLIC_FINANCE_CORE_TEENS_KIDS_SHEET_ID || ''
     };
     return sheetIds[section as keyof typeof sheetIds] || sheetIds['Core Adults'];
   }
   
   private static getSheetName(section: string): string {
     const sheetNames = {
-      '2025 Adults': 'Sheet1',
-      '2025 Kids Teens': 'Sheet1',
-      'Core Adults': 'Sheet1',
-      'Core Teens Kids': 'Sheet1'
+      'Core Adults': 'Adult Core Team',
+      'Core Teens Kids': 'APT Core Teens'
     };
     return sheetNames[section as keyof typeof sheetNames] || 'Sheet1';
   }
   
-  private static getColumnInfo(section: string) {
-    if (section === 'Core Teens Kids') {
-      return { column: 'M', index: 12 }; // Column M (index 12)
+  private static getCurrentMonthHeader(): string {
+    const now = new Date();
+    const month = now.toLocaleString('en-US', { month: 'long' });
+    const year = now.getFullYear();
+    return `${month}'${year}`;
+  }
+
+  private static findMonthColumn(headerRow: string[]): { column: string; index: number } | null {
+    const target = this.getCurrentMonthHeader();
+    console.log('Looking for column:', target);
+    console.log('Available headers:', headerRow);
+    for (let i = 0; i < headerRow.length; i++) {
+      if (headerRow[i]?.trim() === target) {
+        const column = String.fromCharCode(65 + i);
+        return { column, index: i };
+      }
     }
-    if (section === '2025 Adults') {
-      return { column: 'J', index: 9 }; // Column J (index 9)
-    }
-    if (section === '2025 Kids Teens') {
-      return { column: 'F', index: 5 }; // Column F (index 5)
-    }
-    return { column: 'E', index: 4 }; // Column E (index 4) for Core Adults
+    return null;
   }
   
   static async updatePaymentStatus(data: {
@@ -42,31 +45,32 @@ export class FinanceSheetsService {
       const sheetId = this.getSheetId(data.section);
       const sheetName = this.getSheetName(data.section);
       
-      console.log(`Attempting to access sheet: ${sheetId}, sheet name: ${sheetName}`);
-      
-      // Get all data to find the member's row
       const response = await fetch(
         `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(sheetName)}`,
         {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          }
+          headers: { 'Authorization': `Bearer ${accessToken}` }
         }
       );
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`API Error: ${response.status} - ${errorText}`);
         throw new Error(`Failed to fetch data: ${response.status} - ${errorText}`);
       }
 
       const sheetData = await response.json();
       const rows = sheetData.values || [];
       
+      // Row 6 (index 5) has month headers
+      const headerRow = rows[5] || [];
+      const columnInfo = this.findMonthColumn(headerRow);
+      if (!columnInfo) {
+        throw new Error(`Column for ${this.getCurrentMonthHeader()} not found in spreadsheet`);
+      }
+
       // Find the member's row (name is in column C)
       let rowIndex = -1;
-      for (let i = 1; i < rows.length; i++) { // Skip header row
-        if (rows[i][2] === data.memberName) { // Column C (index 2)
+      for (let i = 6; i < rows.length; i++) {
+        if (rows[i][2]?.replace(/\s+/g, ' ').trim() === data.memberName.replace(/\s+/g, ' ').trim()) {
           rowIndex = i + 1; // Google Sheets is 1-indexed
           break;
         }
@@ -76,13 +80,11 @@ export class FinanceSheetsService {
         throw new Error(`Member ${data.memberName} not found in spreadsheet`);
       }
 
-      // Update payment column based on section
-      const columnInfo = this.getColumnInfo(data.section);
       const range = `${sheetName}!${columnInfo.column}${rowIndex}`;
-      const values = [[data.status]];
+      const values = [[data.status === 'paid' ? '$20' : '']];
 
       const updateResponse = await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?valueInputOption=RAW`,
+        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}?valueInputOption=RAW`,
         {
           method: 'PUT',
           headers: {
@@ -95,7 +97,6 @@ export class FinanceSheetsService {
 
       if (!updateResponse.ok) {
         const errorText = await updateResponse.text();
-        console.error(`Update API Error: ${updateResponse.status} - ${errorText}`);
         throw new Error(`Failed to update payment status: ${updateResponse.status} - ${errorText}`);
       }
 
@@ -114,9 +115,7 @@ export class FinanceSheetsService {
       const response = await fetch(
         `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(sheetName)}`,
         {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          }
+          headers: { 'Authorization': `Bearer ${accessToken}` }
         }
       );
 
@@ -126,12 +125,20 @@ export class FinanceSheetsService {
 
       const data = await response.json();
       const rows = data.values || [];
-      const columnInfo = this.getColumnInfo(section);
+      if (rows.length < 7) return [];
+
+      // Row 6 (index 5) has month headers
+      const headerRow = rows[5] || [];
+      const columnInfo = this.findMonthColumn(headerRow);
+      if (!columnInfo) {
+        console.warn(`Column for ${this.getCurrentMonthHeader()} not found`);
+        return [];
+      }
       
-      // Skip header row and map payment records
-      return rows.slice(1).map((row: string[]) => ({
-        memberName: row[2] || '', // Column C
-        status: row[columnInfo.index] || 'unpaid' // Dynamic column based on section
+      // Data starts after row 6
+      return rows.slice(6).map((row: string[]) => ({
+        memberName: row[2] || '',
+        status: row[columnInfo.index]?.trim() ? 'paid' : 'unpaid'
       }));
     } catch (error) {
       console.error('Error fetching payment status:', error);

@@ -86,6 +86,16 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
+      {isSigningIn && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50">
+          <img 
+            src="/images/ATPLogo.png" 
+            alt="Loading" 
+            className="h-32 w-32 object-contain rounded-full bg-white p-3 animate-spin-slow mb-4"
+          />
+          <p className="text-white text-lg font-medium">Connecting...</p>
+        </div>
+      )}
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4">

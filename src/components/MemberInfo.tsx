@@ -3,21 +3,39 @@
 import { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
 import { useAuth } from '@/contexts/AuthContext';
-import { adults2025 } from '@/data/2025Adults';
-import { kidsTeens2025 } from '@/data/2025KidsTeens';
-import { coreAdults } from '@/data/CoreAdults';
-import { coreTeensKids } from '@/data/CoreTeensKids';
+import { GoogleOAuthService } from '@/lib/google-oauth';
+import { MembersSheetsService } from '@/lib/members-sheets-service';
 
 export default function MemberInfo() {
   const [qrCode, setQrCode] = useState<string>('');
+  const [allMembers, setAllMembers] = useState<{name: string; batch: string}[]>([]);
   const { user } = useAuth();
 
-  const allMembers = [
-    ...adults2025.map(name => ({ name, batch: '2025 Adults' })),
-    ...kidsTeens2025.map(name => ({ name, batch: '2025 Kids Teens' })),
-    ...coreAdults.map(name => ({ name, batch: 'Core Adults' })),
-    ...coreTeensKids.map(name => ({ name, batch: 'Core Teens Kids' }))
-  ];
+  useEffect(() => {
+    loadMembers();
+  }, []);
+
+  const loadMembers = async () => {
+    try {
+      const accessToken = await GoogleOAuthService.getAccessToken();
+      if (!accessToken) return;
+
+      const sheets = [
+        { id: process.env.NEXT_PUBLIC_FINANCE_CORE_ADULTS_SHEET_ID || '', tab: 'Adult Core Team', batch: 'Core Adults' },
+        { id: process.env.NEXT_PUBLIC_FINANCE_CORE_TEENS_KIDS_SHEET_ID || '', tab: 'APT Core Teens', batch: 'Core Teens Kids' },
+      ];
+
+      const members: {name: string; batch: string}[] = [];
+      for (const { id, tab, batch } of sheets) {
+        if (!id) continue;
+        const names = await MembersSheetsService.getMemberNamesFromSheet(id, accessToken, tab);
+        members.push(...names.map(name => ({ name, batch })));
+      }
+      setAllMembers(members);
+    } catch (error) {
+      console.error('Failed to load members:', error);
+    }
+  };
 
   useEffect(() => {
     if (user?.name) {
